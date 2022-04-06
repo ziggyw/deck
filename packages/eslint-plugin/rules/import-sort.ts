@@ -3,7 +3,7 @@ import type { ImportDeclaration, ImportDefaultSpecifier, ImportNamespaceSpecifie
 
 const CSS_IMPORT = /\.(css|less|scss|sass)$/;
 const MODULE_PATH_REGEX = /[./]*(.*)$/;
-const SPINNAKER_MODULE_PREFIX = /^(core|docker|amazon|titus|google|kubernetes|ecs|huaweicloud|appengine|oracle|cloudfoundry|azure|tencentcloud)\/.*/;
+const SPINNAKER_MODULE_PREFIX = /^(core|docker|amazon|titus|google|kubernetes|ecs|huaweicloud|appengine|oracle|cloudfoundry|azure|tencentcloud|alicloud)\/.*/;
 /**
  * Function supplied to an array's sort method that works on the path and module name skipping ., .. and /
  */

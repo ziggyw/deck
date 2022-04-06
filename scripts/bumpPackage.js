@@ -22,6 +22,7 @@ const packages = [
   'packages/appengine/',
   'packages/azure/',
   'packages/cloudfoundry/',
+  'packages/alicloud/',
   'packages/core/',
   'packages/docker/',
   'packages/ecs/',

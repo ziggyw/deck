@@ -48,6 +48,8 @@ const webpackConfig = {
       '@spinnaker/kubernetes': path.resolve(`${MODULES_ROOT}/kubernetes/src`),
       oracle: path.resolve(`${MODULES_ROOT}/oracle/src`),
       '@spinnaker/oracle': path.resolve(`${MODULES_ROOT}/oracle/src`),
+      alicloud: path.resolve(`${MODULES_ROOT}/alicloud/src`),
+      '@spinnaker/alicloud': path.resolve(`${MODULES_ROOT}/alicloud/src`),
       tencentcloud: path.resolve(`${MODULES_ROOT}/tencentcloud/src`),
       '@spinnaker/tencentcloud': path.resolve(`${MODULES_ROOT}/tencentcloud/src`),
       titus: path.resolve(`${MODULES_ROOT}/titus/src`),

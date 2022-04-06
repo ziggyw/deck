@@ -96,6 +96,7 @@ window.spinnakerSettings = {
     'kubernetes',
     'oracle',
     'tencentcloud',
+    'alicloud',
   ],
   defaultTimeZone: process.env.TIMEZONE || 'America/Los_Angeles', // see http://momentjs.com/timezone/docs/#/data-utilities/
   disabledImages: [],
@@ -265,6 +266,12 @@ window.spinnakerSettings = {
       defaults: {
         account: 'test',
         region: 'ap-guangzhou',
+      },
+    },
+    alicloud: {
+      defaults: {
+        account: 'test',
+        region: 'cn-hangzhou',
       },
     },
   },

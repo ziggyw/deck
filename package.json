@@ -98,6 +98,7 @@
     "packages/presentation",
     "packages/scripts",
     "packages/tencentcloud",
+    "packages/alicloud",
     "packages/titus"
   ],
   "lint-staged": {

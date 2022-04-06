@@ -61,5 +61,8 @@ testContext.keys().forEach(testContext);
 testContext = require.context('./packages/tencentcloud/src', true, /\.spec\.(js|ts|tsx)$/);
 testContext.keys().forEach(testContext);
 
+testContext = require.context('./packages/alicloud/src', true, /\.spec\.(js|ts|tsx)$/);
+testContext.keys().forEach(testContext);
+
 testContext = require.context('./packages/titus/src', true, /\.spec\.(js|ts|tsx)$/);
 testContext.keys().forEach(testContext);

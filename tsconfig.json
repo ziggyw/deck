@@ -57,7 +57,10 @@
       "azure": ["azure/src"],
       "@spinnaker/ecs": ["ecs/src"],
       "ecs/*": ["ecs/src/*"],
-      "ecs": ["ecs/src"]
+      "ecs": ["ecs/src"],
+      "@spinnaker/alicloud": ["alicloud/src/*"],
+      "alicloud/*": ["alicloud/src/*"],
+      "alicloud": ["alicloud/src"]
     },
     "pretty": true,
     "removeComments": false,

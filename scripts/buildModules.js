@@ -9,7 +9,6 @@ const PACKAGES_ROOT = path.resolve(`${DECK_ROOT}/packages`);
 
 const runYarnBuild = (pathToPackage) => {
   const cmd = `yarn --cwd ${pathToPackage} build`;
-  console.log(cmd);
   return exec(cmd);
 };
 
@@ -29,12 +28,12 @@ async function buildModules() {
         'kubernetes',
         'oracle',
         'tencentcloud',
+        'alicloud',
       ].map((module) => runYarnBuild(`${PACKAGES_ROOT}/${module}`)),
     );
 
     await Promise.all(['ecs', 'titus'].map((module) => runYarnBuild(`${PACKAGES_ROOT}/${module}`)));
   } catch (err) {
-    console.log(err.stdout);
     console.error(err.stderr);
     process.exit(255);
   }
