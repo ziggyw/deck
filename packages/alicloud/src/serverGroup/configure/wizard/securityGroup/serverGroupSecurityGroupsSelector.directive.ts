@@ -16,6 +16,8 @@ angular.module(ALICLOUD_SERVERGROUP_SECURITY_DIRECTIVE, []).directive('alicloudS
       templateUrl: require('./serverGroupSecurityGroupsSelector.directive.html'),
       link: function (scope: any) {
         scope.firewallLabel = FirewallLabels.get('firewall');
+        scope.keypairLabel = FirewallLabels.get('keypair');
+        scope.securitygroupLabel = FirewallLabels.get('securitygroup');
         scope.getSecurityGroupRefreshTime = function () {
           return InfrastructureCaches.get('securityGroups').getStats().ageMax;
         };
