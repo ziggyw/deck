@@ -217,7 +217,7 @@ export class ServerGroupSecurityId extends React.Component<ISubnetOption, {}> {
                 <label className="sm-label-right"> SecurityGroupId </label>
               </div>
               {values.vSwitchId === null ? (
-                <h5 className="text-center col-md-7">(please select a subnet)</h5>
+                <h5 className="text-center col-md-7">(please select a security group)</h5>
               ) : (
                 <div className="col-md-7">
                   <Select
