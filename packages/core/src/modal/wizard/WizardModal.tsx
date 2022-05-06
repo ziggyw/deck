@@ -163,7 +163,6 @@ export class WizardModal<T = {}>
     return (
       <>
         {taskMonitor && <TaskMonitorWrapper monitor={taskMonitor} />}
-
         <SpinFormik<T>
           ref={this.formikRef}
           initialValues={initialValues}

@@ -4,6 +4,10 @@ import { module } from 'angular';
 
 import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
+import { AlicloudFunctionDetails } from './function';
+import { CreateLambdaFunction } from './function/CreateLambdaFunction';
+import { ALICLOUD_FUNCTION_MODULE } from './function/function.module';
+import { AlicloudFunctionTransformer } from './function/function.transformer';
 import './help/alicloud.help';
 import { ALICLOUD_IMAGE } from './image/image.reader';
 import { ALICLOUD_INSTANCE_SERVICE } from './instance/alicloudInstanceType.service';
@@ -21,7 +25,6 @@ import { ALICLOUD_PIPELINE_STAGES_FINDAMI_ALICLOUDFINDAMISTAGE } from './pipelin
 import { ALICLOUD_PIPELINE_STAGES_FINDIMAGEFROMTAGS_ALICLOUDFINDIMAGEFROMTAGSSTAGE } from './pipeline/stages/findImageFromTags/alicloudFindImageFromTagsStage';
 import { ALICLOUD_PIPELINE_STAGES_RESIZEASG_ALICLOUDRESIZEASGSTAGE } from './pipeline/stages/resizeAsg/alicloudResizeAsgStage';
 import { ALICLOUD_PIPELINE_STAGES_ROLLBACKCLUSTER_ALICLOUDROLLBACKCLUSTERSTAGE } from './pipeline/stages/rollbackCluster/alicloudRollbackClusterStage';
-
 import { ALICLOUD_PIPELINE_STAGES_SCALEDOWNCLUSTER_ALICLOUDSCALEDOWNCLUSTERSTAGE } from './pipeline/stages/scaleDownCluster/alicloudScaleDownClusterStage';
 import { ALICLOUD_PIPELINE_STAGES_TAGIMAGE_ALICLOUDTAGIMAGESTAGE } from './pipeline/stages/tagImage/alicloudTagImageStage';
 import { ALICLOUD_SECURITY_CREATECTRL } from './securityGroup/configure/CreateSecurityGroupCtrl';
@@ -79,6 +82,8 @@ module(ALICLOUD_MODULE, [
 
   ALICLOUD_IMAGE,
   ALICLOU_VALIDATION,
+
+  ALICLOUD_FUNCTION_MODULE,
 ]).config(function () {
   CloudProviderRegistry.registerProvider('alicloud', {
     name: 'AlibabaCloud',
@@ -120,6 +125,11 @@ module(ALICLOUD_MODULE, [
       // CreateLoadBalancerModal: ConfigureLoadBalancerModal,
       createLoadBalancerTemplateUrl: require('./loadBalancer/configure/createLoadBalancer.html'),
       createLoadBalancerController: 'alicloudCreateLoadBalancerCtrl',
+    },
+    function: {
+      details: AlicloudFunctionDetails,
+      CreateFunctionModal: CreateLambdaFunction,
+      transformer: AlicloudFunctionTransformer,
     },
   });
 });

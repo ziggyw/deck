@@ -5,6 +5,7 @@ import { default as UIROUTER_ANGULARJS } from '@uirouter/angularjs';
 import {
   ConfirmationModalService,
   FirewallLabels,
+  /* A service that is used to read load balancer data. */
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerWriter,
   SECURITY_GROUP_READER,
