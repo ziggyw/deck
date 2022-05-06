@@ -3,3 +3,4 @@
   e.g.,
   window.spinnakerSettings.defaultInstancePort = 8080;
 */
+window.spinnakerSettings.feature.functions = true;
