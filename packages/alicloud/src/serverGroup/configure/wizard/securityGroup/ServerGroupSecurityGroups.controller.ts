@@ -128,7 +128,7 @@ angular
             .then(function (pairs: any) {
               const pairval: any[] = [];
               pairs.forEach((item: any) => {
-                if (item.account === $scope.command.credentials) {
+                if (item.account === $scope.command.credentials && item.region === newVal) {
                   pairval.push(item.keyName);
                 }
               });
