@@ -13,7 +13,7 @@ import {
   SETTINGS,
 } from '@spinnaker/core';
 
-import { ConfigureLoadBalancerModal } from '../configure/ConfigureLoadBalancerModal';
+import { CLBConfigureLoadBalancerModal } from '../configure/clb/CLBConfigureLoadBalancerModal';
 
 export class LoadBalancerDetail extends React.Component {
   constructor(props: any) {
@@ -73,7 +73,7 @@ export class LoadBalancerDetail extends React.Component {
     const { loadBalancer, app }: any = this.props;
     const application = app;
     const loadBalancers: any = loadBalancer;
-    const LoadBalancerModal = ConfigureLoadBalancerModal;
+    const LoadBalancerModal = CLBConfigureLoadBalancerModal;
     LoadBalancerModal.show({ app: application, loadBalancer: loadBalancers });
   };
 

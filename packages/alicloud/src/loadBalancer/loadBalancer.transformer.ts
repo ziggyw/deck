@@ -132,6 +132,92 @@ export class AlicloudLoadBalancerTransformer {
       ],
     };
   }
+  public convertApplicationLoadBalancerForEditing(loadBalancer: any) {
+    const toEdit: any = {
+      region: loadBalancer.region,
+      credentials: loadBalancer.account,
+      name: loadBalancer.name,
+      stack: loadBalancer.stack,
+      detail: loadBalancer.detail,
+      vnet: loadBalancer.vnet,
+      masterZoneId: loadBalancer.masterZoneId,
+      address: loadBalancer.elb.results.attributes.address,
+      addressIPVersion: loadBalancer.elb.results.attributes.addressIPVersion,
+      addressType: loadBalancer.elb.results.attributes.addressType,
+      deleteProtection: loadBalancer.elb.results.attributes.deleteProtection,
+      loadBalancerSpec: loadBalancer.elb.results.attributes.loadBalancerSpec,
+      vSwitchId: loadBalancer.elb.results.vswitchId,
+      vSwitchName: loadBalancer.elb.results.vswitchName || '',
+      subnet: loadBalancer.subnet,
+      probes: [],
+      loadBalancingRules: [],
+      listenerPortsAndProtocal: loadBalancer.elb.results.attributes.listenerPortsAndProtocal,
+      listeners: loadBalancer.elb.results.attributes.listenerPortsAndProtocal,
+    };
+    if (loadBalancer.elb) {
+      const elb: any = loadBalancer.elb;
+      toEdit.securityGroups = elb.securityGroups;
+      toEdit.vnet = elb.vnet;
+      toEdit.probes = elb.probes;
+    }
+    return toEdit;
+  }
+
+  public constructNewApplicationLoadBalancerTemplate(application: any) {
+    const defaultRegion: string = application.defaultRegions.alicloud || AliCloudProviderSettings.defaults.region;
+    const defaultTargetGroupName = `servergroup`;
+    return {
+      stack: '',
+      detail: 'frontend',
+      loadBalancerType: 'ALB',
+      loadBalancerName: '',
+      addressType: 'Intranet',
+      addressAllocatedMode: 'Dynamic',
+      vpcId: '',
+      // @ts-ignore
+      zoneMappings: [],
+      serverGroups: [
+        {
+          serverGroupName: defaultTargetGroupName,
+          protocol: 'HTTP',
+          Scheduler: 'Wrr',
+          serverGroupType: 'Instance',
+          healthCheckConfig: {
+            healthCheckConnectPort: 80,
+            healthCheckEnabled: true,
+            healthCheckPath: '/healthcheck',
+            healthCheckTimeout: 5,
+            healthCheckInterval: 10,
+            healthyThreshold: 10,
+            unhealthyThreshold: 2,
+          },
+          stickySessionConfig: {
+            stickySessionEnabled: true,
+            stickySessionType: 'Insert',
+            cookieTimeout: 300,
+          },
+        },
+      ],
+
+      listeners: [
+        {
+          listenerProtocal: 'HTTP',
+          // @ts-ignore
+          certificates: [],
+          listenerPort: 80,
+          defaultActions: [
+            {
+              type: 'ForwardGroup',
+              serverGroupName: defaultTargetGroupName,
+            },
+          ],
+          // @ts-ignore
+          rules: [],
+        },
+      ],
+      region: defaultRegion,
+    };
+  }
 }
 
 export const ALICLOUD_LOADBALANCER_BALANCER = 'spinnaker.alicloud.loadBalancer.transformer';

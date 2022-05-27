@@ -15,7 +15,7 @@ import {
 
 import { ALBListeners } from './Listeners';
 import { LoadBalancerLocation } from './LoadBalancerLocation';
-import { AlicloudLoadBalancerTransformer } from '../loadBalancer.transformer';
+import { AlicloudLoadBalancerTransformer } from '../../loadBalancer.transformer';
 
 export interface ICreateApplicationLoadBalancerProps extends ILoadBalancerModalProps {
   application: any;
@@ -29,7 +29,7 @@ export interface ICreateApplicationLoadBalancerState {
   taskMonitor: TaskMonitor;
 }
 
-export class ConfigureLoadBalancerModal extends React.Component<
+export class CLBConfigureLoadBalancerModal extends React.Component<
   ICreateApplicationLoadBalancerProps,
   ICreateApplicationLoadBalancerState
 > {
@@ -42,7 +42,7 @@ export class ConfigureLoadBalancerModal extends React.Component<
 
   public static show(props: any): Promise<any> {
     const modalProps = { dialogClassName: 'wizard-modal modal-lg' };
-    return ReactModal.show(ConfigureLoadBalancerModal, props, modalProps);
+    return ReactModal.show(CLBConfigureLoadBalancerModal, props, modalProps);
   }
   private $q: IQService;
 
@@ -97,6 +97,7 @@ export class ConfigureLoadBalancerModal extends React.Component<
     taskMonitor.submit(function () {
       const params = {
         cloudProvider: 'alicloud',
+        loadBalancerType: 'CLB',
         appName: application.name,
         loadBalancerName: application.applicationName + '-' + values.stack + '-' + values.detail,
         regionId: values.region,

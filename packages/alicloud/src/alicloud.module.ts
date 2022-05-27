@@ -12,6 +12,7 @@ import './help/alicloud.help';
 import { ALICLOUD_IMAGE } from './image/image.reader';
 import { ALICLOUD_INSTANCE_SERVICE } from './instance/alicloudInstanceType.service';
 import { ALICLOUD_INSTANCE_DETAILCTRL } from './instance/details/instance.details.controller';
+import { AlicloudLoadBalancerChoiceModal } from './loadBalancer/configure/choiceModal/AlicloudBalancerChoiceModal';
 import { ALICLOUD_LOADBALANCER_CREATE } from './loadBalancer/configure/createLoadBalancer.controller';
 import { ALICLOUD_LOADBALANCER_DETAILS } from './loadBalancer/details/loadBalancerDetail.controller';
 import { ALICLOUD_LOADBALANCER_BALANCER } from './loadBalancer/loadBalancer.transformer';
@@ -40,6 +41,7 @@ import { ALICLOUD_SERVERGROUP_TRANSFORMER } from './serverGroup/serverGroup.tran
 import { ALICLOU_VALIDATION } from './validation/applicationName.validator';
 
 import './logo/alicloud.logo.less';
+// import { ConfigureLoadBalancerModal } from './loadBalancer/configure/ConfigureLoadBalancerModal';
 
 // load all templates into the $templateCache
 const templates = require.context('./', true, /\.html$/);
@@ -122,9 +124,10 @@ module(ALICLOUD_MODULE, [
       transformer: 'alicloudLoadBalancerTransformer',
       detailsTemplateUrl: require('./loadBalancer/details/loadBalancerDetail.html'),
       detailsController: 'alicloudLoadBalancerDetailsCtrl',
+      CreateLoadBalancerModal: AlicloudLoadBalancerChoiceModal,
       // CreateLoadBalancerModal: ConfigureLoadBalancerModal,
-      createLoadBalancerTemplateUrl: require('./loadBalancer/configure/createLoadBalancer.html'),
-      createLoadBalancerController: 'alicloudCreateLoadBalancerCtrl',
+      // createLoadBalancerTemplateUrl: require('./loadBalancer/configure/createLoadBalancer.html'),
+      // createLoadBalancerController: 'alicloudCreateLoadBalancerCtrl',
     },
     function: {
       details: AlicloudFunctionDetails,

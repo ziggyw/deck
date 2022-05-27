@@ -204,7 +204,7 @@ export class LoadBalancerLocation extends React.Component<ILoadBalancerLocationP
         label: 'slb.s3.large',
       },
     ];
-    const zoneIds: any = [];
+    const zoneIds: any = ['cn-hangzhou-b', 'cn-beijing'];
     zoneId.forEach((item: any) => {
       const obj: any = {};
       obj.value = item;
@@ -329,7 +329,7 @@ export class LoadBalancerLocation extends React.Component<ILoadBalancerLocationP
                   <div className="col-md-3 sm-label-right">ZoneId</div>
                   <div className="col-md-7">
                     <Select
-                      required={true}
+                      required={false}
                       value={values.masterZoneId}
                       options={zoneIds}
                       onChange={this.changeZoneId}

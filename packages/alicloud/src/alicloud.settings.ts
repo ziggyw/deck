@@ -27,6 +27,11 @@ export interface IAliCloudProviderSettings extends IProviderSettings {
   };
   minRootVolumeSize?: number;
   disableSpotPricing?: boolean;
+  createLoadBalancerWarnings?: {
+    application?: string;
+    classic?: string;
+    network?: string;
+  };
 }
 
 export const AliCloudProviderSettings: IAliCloudProviderSettings = (SETTINGS.providers
