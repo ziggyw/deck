@@ -26,9 +26,9 @@
             <tr>
               <td>
                 <select
-                  class="form-control input-sm formtype listenerProtocal"
-                  ng-model="rule.listenerProtocal"
-                  ng-change="typeChange($index,rule.listenerProtocal,rule)"
+                  class="form-control input-sm formtype listenerProtocol"
+                  ng-model="rule.listenerProtocol"
+                  ng-change="typeChange($index,rule.listenerProtocol,rule)"
                   ng-options="protocol for protocol in ['HTTP','TCP','HTTPS']"
                 ></select>
               </td>
@@ -67,8 +67,8 @@
                 <select
                   class="form-control input-sm formhealthcheck"
                   ng-model="rule.healthCheck"
-                  ng-disabled="rule.listenerProtocal=='TCP'"
-                  ng-required="rule.listenerProtocal!='TCP'"
+                  ng-disabled="rule.listenerProtocol=='TCP'"
+                  ng-required="rule.listenerProtocol!='TCP'"
                   ng-change="healthChange(rule.healthCheck,$index,rule)"
                   ng-options="healthcheck for healthcheck in ['on','off']"
                 ></select>
@@ -80,7 +80,7 @@
                 <input
                   class="form-control input-sm formuri"
                   ng-required="rule.healthCheck=='on'"
-                  ng-disabled="rule.healthCheck=='off'||rule.listenerProtocal=='TCP'"
+                  ng-disabled="rule.healthCheck=='off'||rule.listenerProtocol=='TCP'"
                   type="text"
                   ng-pattern="/\/(.*?\.html)?$/"
                   ng-model="rule.healthCheckURI"
@@ -148,8 +148,8 @@
               <td colspan="2">
                 <div class="">
                   <select
-                    ng-required="rule.listenerProtocal!='TCP' && rule.healthCheck!='off'"
-                    ng-disabled="rule.listenerProtocal=='TCP' || rule.healthCheck=='off'"
+                    ng-required="rule.listenerProtocol!='TCP' && rule.healthCheck!='off'"
+                    ng-disabled="rule.listenerProtocol=='TCP' || rule.healthCheck=='off'"
                     class="form-control input-sm formSticksession"
                     ng-model="rule.stickySession"
                     ng-change="stickySessionchange(rule.stickySession,rule)"
@@ -165,8 +165,8 @@
                   <input
                     class="form-control input-sm"
                     type="text"
-                    ng-disabled="rule.listenerProtocal=='TCP' || rule.stickySession == 'off' || rule.healthCheck=='off' "
-                    ng-required="rule.stickySession=='on' && rule.stickySessionType=='server' && rule.listenerProtocal!='TCP'"
+                    ng-disabled="rule.listenerProtocol=='TCP' || rule.stickySession == 'off' || rule.healthCheck=='off' "
+                    ng-required="rule.stickySession=='on' && rule.stickySessionType=='server' && rule.listenerProtocol!='TCP'"
                     ng-pattern="/^(?=[^,; ]+$)[^\$][\x00-\x7f]{1,200}/"
                     ng-model="rule.cookie"
                   />
@@ -177,7 +177,7 @@
                 <div class="">
                   <input
                     class="form-control input-sm"
-                    ng-disabled="rule.stickySession == 'off' || rule.healthCheck=='off' || rule.listenerProtocal=='TCP'"
+                    ng-disabled="rule.stickySession == 'off' || rule.healthCheck=='off' || rule.listenerProtocol=='TCP'"
                     type="number"
                     min="1"
                     max="86400"
@@ -192,8 +192,8 @@
                 <select
                   class="form-control input-sm"
                   ng-model="rule.gzip"
-                  ng-disabled="rule.healthCheck == 'off' || rule.listenerProtocal=='TCP'"
-                  ng-required="rule.stickySession=='on' && rule.stickySessionType=='insert' && rule.listenerProtocal!='TCP'"
+                  ng-disabled="rule.healthCheck == 'off' || rule.listenerProtocol=='TCP'"
+                  ng-required="rule.stickySession=='on' && rule.stickySessionType=='insert' && rule.listenerProtocol!='TCP'"
                   ng-change="Gzipchange()"
                   ng-options="Gzip for Gzip in ['on','off']"
                 ></select>
@@ -216,7 +216,7 @@
                 <div>
                   <input
                     class="form-control input-sm"
-                    ng-disabled="rule.healthCheck=='off'|| rule.listenerProtocal=='TCP'"
+                    ng-disabled="rule.healthCheck=='off'|| rule.listenerProtocol=='TCP'"
                     type="number"
                     min="1"
                     max="60"
@@ -229,7 +229,7 @@
                 <select
                   class="form-control input-sm"
                   ng-required="rule.stickySession=='on'"
-                  ng-disabled="rule.stickySession == 'off' || rule.listenerProtocal=='TCP' || rule.healthCheck=='off' "
+                  ng-disabled="rule.stickySession == 'off' || rule.listenerProtocol=='TCP' || rule.healthCheck=='off' "
                   ng-model="rule.stickySessionType"
                   ng-change="StickySessionTypechange()"
                   ng-options="StickySessionType for StickySessionType in ['insert','server']"
@@ -242,7 +242,7 @@
                 <div class="">
                   <input
                     class="form-control input-sm"
-                    ng-disabled="rule.healthCheck=='off' || rule.listenerProtocal=='TCP'"
+                    ng-disabled="rule.healthCheck=='off' || rule.listenerProtocol=='TCP'"
                     type="number"
                     min="1"
                     max="180"
@@ -269,7 +269,7 @@
                 <div class="">
                   <input
                     class="form-control input-sm"
-                    ng-disabled="rule.listenerProtocal !== 'HTTPS'"
+                    ng-disabled="rule.listenerProtocol !== 'HTTPS'"
                     type="text"
                     ng-model="rule.serverCertificateId"
                   />

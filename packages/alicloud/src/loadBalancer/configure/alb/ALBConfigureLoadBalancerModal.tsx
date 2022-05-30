@@ -103,25 +103,14 @@ export class ALBConfigureLoadBalancerModal extends React.Component<
         appName: application.name,
         loadBalancerName: application.applicationName + '-' + values.stack + '-' + values.detail,
         name: application.applicationName + '-' + values.stack + '-' + values.detail,
-        regionId: values.region,
-        // subnetId: values.vSwitchId,
+        // regionId: values.region,
       };
-      // delete values.detail;
-      // delete values.stack;
-      // delete values.user;
-      // const name = application.applicationName + '-' + values.stack + '-' + values.detail;
-      // const ruleNameBase = name + '-rule';
-      // values.type = 'upsertLoadBalancer';
-      // values.moniker = {
-      //   app: application.name,
-      //   stack: values.stack,
-      //   detail: values.detail,
-      //   cluster: name,
-      // };
 
-      // values.loadBalancingRules.forEach((rule: any, index: number) => {
-      //   rule.ruleName = ruleNameBase + index;
-      // });
+      values.listeners.forEach((listener: { rules: any[] }) => {
+        listener.rules.forEach((rule, index) => {
+          rule.priority = index + 1;
+        });
+      });
 
       return LoadBalancerWriter.upsertLoadBalancer(values, application, descriptor, params);
     });

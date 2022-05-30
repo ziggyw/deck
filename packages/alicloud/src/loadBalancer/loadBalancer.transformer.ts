@@ -98,7 +98,7 @@ export class AlicloudLoadBalancerTransformer {
       ],
       listeners: [
         {
-          listenerProtocal: 'HTTP',
+          listenerProtocol: 'HTTP',
           healthCheck: 'on',
           healthCheckTimeout: 5,
           unhealthyThreshold: 4,
@@ -201,7 +201,7 @@ export class AlicloudLoadBalancerTransformer {
 
       listeners: [
         {
-          listenerProtocal: 'HTTP',
+          listenerProtocol: 'HTTP',
           // @ts-ignore
           certificates: [],
           listenerPort: 80,

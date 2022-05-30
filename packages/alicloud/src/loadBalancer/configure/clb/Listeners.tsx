@@ -58,7 +58,7 @@ export class ALBListeners extends React.Component<IListenersProps> {
         setFieldValue('listeners.ServerCertificateId', null);
       }
     }
-    setFieldValue('listeners.listenerProtocal', newProtocol);
+    setFieldValue('listeners.listenerProtocol', newProtocol);
     this.updateListeners();
   }
 
@@ -213,7 +213,7 @@ export class ALBListeners extends React.Component<IListenersProps> {
 
   private addListener = (): void => {
     this.props.formik.values.listeners.push({
-      listenerProtocal: 'HTTP',
+      listenerProtocol: 'HTTP',
       listenerPort: 80,
       backendServerPort: 80,
     });
@@ -251,7 +251,7 @@ export class ALBListeners extends React.Component<IListenersProps> {
                       <td>
                         <select
                           className="form-control input-sm"
-                          value={listener.listenerProtocal}
+                          value={listener.listenerProtocol}
                           onChange={(event) => this.listenerPortChanged(listener, event.target.value)}
                         >
                           {this.protocols.map((p) => (
@@ -298,8 +298,8 @@ export class ALBListeners extends React.Component<IListenersProps> {
                         <select
                           className="form-control input-sm"
                           value={listener.healthCheck}
-                          disabled={listener.listenerProtocal === 'TCP'}
-                          required={listener.listenerProtocal !== 'TCP'}
+                          disabled={listener.listenerProtocol === 'TCP'}
+                          required={listener.listenerProtocol !== 'TCP'}
                           onChange={(event) => this.healthChange(listener, event.target.value)}
                         >
                           <option key={'on'}>on</option>
@@ -314,7 +314,7 @@ export class ALBListeners extends React.Component<IListenersProps> {
                         <input
                           className="form-control input-sm formuri"
                           required={listener.healthCheck === 'on'}
-                          disabled={listener.healthCheck === 'off' || listener.listenerProtocal === 'TCP'}
+                          disabled={listener.healthCheck === 'off' || listener.listenerProtocol === 'TCP'}
                           type="text"
                           onChange={(event) => this.listenerhealthCheckURIChanged(listener, event.target.value)}
                           value={listener.healthCheckURI}
@@ -391,8 +391,8 @@ export class ALBListeners extends React.Component<IListenersProps> {
                       <td colSpan={2}>
                         <div className="">
                           <select
-                            required={listener.listenerProtocal !== 'TCP' && listener.healthCheck !== 'off'}
-                            disabled={listener.listenerProtocal === 'TCP' || listener.healthCheck === 'off'}
+                            required={listener.listenerProtocol !== 'TCP' && listener.healthCheck !== 'off'}
+                            disabled={listener.listenerProtocol === 'TCP' || listener.healthCheck === 'off'}
                             className="form-control input-sm formSticksession"
                             value={listener.stickySession}
                             onChange={(event) => this.stickySessionChange(listener, event.target.value)}
@@ -412,14 +412,14 @@ export class ALBListeners extends React.Component<IListenersProps> {
                             className="form-control input-sm"
                             type="text"
                             disabled={
-                              listener.listenerProtocal === 'TCP' ||
+                              listener.listenerProtocol === 'TCP' ||
                               listener.stickySession === 'off' ||
                               listener.healthCheck === 'off'
                             }
                             required={
                               listener.stickySession === 'on' &&
                               listener.stickySessionType === 'server' &&
-                              listener.listenerProtocal !== 'TCP'
+                              listener.listenerProtocol !== 'TCP'
                             }
                             value={listener.cookie}
                             onChange={(event) => this.listenerCookieChanged(listener, event.target.value)}
@@ -439,7 +439,7 @@ export class ALBListeners extends React.Component<IListenersProps> {
                             disabled={
                               listener.stickySession === 'off' ||
                               listener.healthCheck === 'off' ||
-                              listener.listenerProtocal === 'TCP'
+                              listener.listenerProtocol === 'TCP'
                             }
                             type="number"
                             min="1"
@@ -456,11 +456,11 @@ export class ALBListeners extends React.Component<IListenersProps> {
                         <select
                           className="form-control input-sm"
                           value={listener.gzip}
-                          disabled={listener.healthCheck === 'off' || listener.listenerProtocal === 'TCP'}
+                          disabled={listener.healthCheck === 'off' || listener.listenerProtocol === 'TCP'}
                           required={
                             listener.stickySession === 'on' &&
                             listener.stickySessionType === 'insert' &&
-                            listener.listenerProtocal !== 'TCP'
+                            listener.listenerProtocol !== 'TCP'
                           }
                           onChange={(event) => this.Gzipchange(listener, event.target.value)}
                         >
@@ -490,7 +490,7 @@ export class ALBListeners extends React.Component<IListenersProps> {
                         <div>
                           <input
                             className="form-control input-sm"
-                            disabled={listener.healthCheck === 'off' || listener.listenerProtocal === 'TCP'}
+                            disabled={listener.healthCheck === 'off' || listener.listenerProtocol === 'TCP'}
                             type="number"
                             min="1"
                             max="60"
@@ -506,7 +506,7 @@ export class ALBListeners extends React.Component<IListenersProps> {
                           required={listener.stickySession === 'on'}
                           disabled={
                             listener.stickySession === 'off' ||
-                            listener.listenerProtocal === 'TCP' ||
+                            listener.listenerProtocol === 'TCP' ||
                             listener.healthCheck === 'off'
                           }
                           value={listener.stickySessionType}
@@ -524,7 +524,7 @@ export class ALBListeners extends React.Component<IListenersProps> {
                         <div className="">
                           <input
                             className="form-control input-sm"
-                            disabled={listener.healthCheck === 'off' || listener.listenerProtocal === 'TCP'}
+                            disabled={listener.healthCheck === 'off' || listener.listenerProtocol === 'TCP'}
                             type="number"
                             min="1"
                             max="180"
@@ -555,7 +555,7 @@ export class ALBListeners extends React.Component<IListenersProps> {
                         <input
                           className="form-control input-sm"
                           type="text"
-                          disabled={listener.listenerProtocal !== 'HTTPS'}
+                          disabled={listener.listenerProtocol !== 'HTTPS'}
                           value={listener.ServerCertificateId}
                           onChange={(event) => this.listenerServerCertificateChanged(listener, event.target.value)}
                         />

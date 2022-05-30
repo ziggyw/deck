@@ -1,12 +1,5 @@
 import type { FormikErrors, FormikProps } from 'formik';
-import {
-  difference,
-  flatten,
-  get,
-  // List, some,
-  uniq,
-  uniqBy,
-} from 'lodash';
+import { difference, flatten, get, some, uniq, uniqBy } from 'lodash';
 import { $q } from 'ngimport';
 import React from 'react';
 import type { SortEnd } from 'react-sortable-hoc';
@@ -93,39 +86,35 @@ export class ALBListeners
       errors.listenerPorts = 'Multiple listeners cannot use the same listenerPort.';
     }
 
-    // const missingRuleFields = values.listeners.find((l: { defaultActions: any[]; rules: any[] }) => {
-    //   const defaultActionsHaveMissingTarget = !!l.defaultActions.find(
-    //     (da: {
-    //       type: string;
-    //       serverGroupName: any;
-    //       authenticateOidcConfig: { clientId: any };
-    //       redirectActionConfig: List<unknown>;
-    //     }) =>
-    //       (da.type === 'ForwardGroup' && !da.serverGroupName) ||
-    //       (da.type === 'authenticate-oidc' && !da.authenticateOidcConfig.clientId) ||
-    //       (da.type === 'Redirect' &&
-    //         (!da.redirectActionConfig || !some(da.redirectActionConfig, (field) => field && field !== ''))),
-    //   );
-    //   const rulesHaveMissingFields = !!l.rules.find((rule: { actions: any[]; conditions: any[] }) => {
-    //     const missingTargets = !!rule.actions.find((a) => a.type === 'ForwardGroup' && !a.serverGroupName);
-    //     const missingAuth = !!rule.actions.find(
-    //       (a) => a.type === 'authenticate-oidc' && !a.authenticateOidcConfig.clientId,
-    //     );
-    //     const missingValue = !!rule.conditions.find((c) => {
-    //       if (c.type === 'Method') {
-    //         return !c.values.length;
-    //       }
-    //       return c.values.includes('');
-    //     });
+    const missingRuleFields = values.listeners.find((l: { defaultActions: any[]; rules: any[] }) => {
+      const defaultActionsHaveMissingTarget = !!l.defaultActions.find(
+        (da: { type: string; serverGroupName: any; authenticateOidcConfig: any; redirectActionConfig: any }) =>
+          (da.type === 'ForwardGroup' && !da.serverGroupName) ||
+          (da.type === 'Redirect' &&
+            (!da.redirectActionConfig || !some(da.redirectActionConfig, (field) => field && field !== ''))),
+      );
+      const rulesHaveMissingFields = !!l.rules.find((rule: { actions: any[]; conditions: any[] }) => {
+        const missingTargets = !!rule.actions.find(
+          (a) =>
+            a.type === 'ForwardGroup' && !a.forwardGroupConfig.serverGroupTuples.find((b: any) => b.serverGroupName),
+        );
+        const missingValue = !!rule.conditions.find((c) => {
+          if (c.type === 'Method') {
+            return !c.values.length;
+          }
+          return c.values.includes('');
+        });
 
-    //     return missingTargets || missingAuth || missingValue;
-    //   });
-    //   return defaultActionsHaveMissingTarget || rulesHaveMissingFields;
-    // });
+        // return missingTargets || missingAuth || missingValue;
+        return missingTargets || missingValue;
+      });
 
-    // if (missingRuleFields) {
-    //   errors.listeners = `Missing types in rule configuration.`;
-    // }
+      return defaultActionsHaveMissingTarget || rulesHaveMissingFields;
+    });
+
+    if (missingRuleFields) {
+      errors.listeners = `Missing types in rule configuration.`;
+    }
 
     return errors;
   }
@@ -230,7 +219,8 @@ export class ALBListeners
 
   private addRule = (listener: any): void => {
     const newRule: any = {
-      priority: listener.rules.length + 1,
+      // priority: listener.rules.length + 1,
+      priority: null,
       actions: [
         {
           type: 'ForwardGroup',

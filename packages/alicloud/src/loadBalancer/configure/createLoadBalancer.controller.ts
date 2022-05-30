@@ -169,7 +169,7 @@ angular
             $scope.accounts = accounts;
           });
           $scope.loadBalancer.listeners.forEach((item: any) => {
-            item.listenerProtocal = _.toUpper(item.listenerProtocal);
+            item.listenerProtocol = _.toUpper(item.listenerProtocol);
           });
 
           const account = $scope.loadBalancer.credentials;
@@ -358,7 +358,7 @@ angular
       };
 
       this.addListener = function () {
-        const un = { listenerProtocal: 'HTTP', healthCheck: 'on', bandwidth: -1 };
+        const un = { listenerProtocol: 'HTTP', healthCheck: 'on', bandwidth: -1 };
         $scope.loadBalancer.listeners.push(un);
       };
       $scope.$watch(

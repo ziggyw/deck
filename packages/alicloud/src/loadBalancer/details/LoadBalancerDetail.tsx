@@ -179,11 +179,11 @@ export class LoadBalancerDetail extends React.Component {
                   <dl style={{ borderBottom: '1px solid #eee', paddingBottom: '20px' }}>
                     <dt>Load Balancer &rarr; Instance</dt>
                     <dd>
-                      {loadBalancingRule.listenerProtocal}:{loadBalancingRule.listenerPort} &rarr;
+                      {loadBalancingRule.listenerProtocol}:{loadBalancingRule.listenerPort} &rarr;
                       {loadBalancingRule.backendServerPort}
                     </dd>
                     <dt>Target</dt>
-                    <dd>{loadBalancingRule.listenerProtocal}</dd>
+                    <dd>{loadBalancingRule.listenerProtocol}</dd>
                     <dt>Interval</dt>
                     <dd>{loadBalancingRule.healthCheckInterval} seconds</dd>
                     <dt>Unhealthy Threshold</dt>
