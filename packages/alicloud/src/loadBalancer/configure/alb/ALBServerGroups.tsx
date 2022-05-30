@@ -7,7 +7,6 @@ import { takeUntil } from 'rxjs/operators';
 import type { Application, IWizardPageComponent } from '@spinnaker/core';
 import {
   FormValidator,
-  HelpField,
   spelNumberCheck,
   SpelNumberInput,
   SpInput,
@@ -237,13 +236,6 @@ export class ServerGroups
             {values.serverGroups.map((serverGroup: any, index: any) => {
               // @ts-ignore
               const serverGroupErrors = (errors.serverGroups && errors.serverGroups[index]) || {};
-              // const has6sTimeout =
-              //   (serverGroup.protocol === 'TCP' || serverGroup.protocol === 'TLS') &&
-              //   serverGroup.healthCheckProtocol === 'HTTP';
-              // const has10sTimeout =
-              //   (serverGroup.protocol === 'TCP' || serverGroup.protocol === 'TLS') &&
-              //   serverGroup.healthCheckProtocol === 'HTTPS';
-
               return (
                 <div key={index} className="wizard-pod">
                   <div>
@@ -275,7 +267,7 @@ export class ServerGroups
                     </div>
                     <div className="wizard-pod-row">
                       <div className="wizard-pod-row-title">
-                        <HelpField id="alicloud.serverGroup.serverGroupType" /> <span>Target Type&nbsp;</span>
+                        <span>Target Type&nbsp;</span>
                       </div>
                       <div className="wizard-pod-row-contents">
                         <div className="wizard-pod-row-data">
@@ -295,9 +287,7 @@ export class ServerGroups
                       </div>
                     </div>
                     <div className="wizard-pod-row">
-                      <div className="wizard-pod-row-title">
-                        <HelpField id="alicloud.serverGroup.serverGroupType" /> <span>Scheduler&nbsp;</span>
-                      </div>
+                      <div className="wizard-pod-row-title"></div>
                       <div className="wizard-pod-row-contents">
                         <div className="wizard-pod-row-data">
                           <span className="wizard-pod-content">
@@ -320,7 +310,6 @@ export class ServerGroups
                           <div className="wizard-pod-row-data">
                             <span className="wizard-pod-content">
                               <label>Protocol </label>
-                              <HelpField id="alicloud.serverGroup.protocol" />{' '}
                               <select
                                 className="form-control input-sm inline-number"
                                 value={serverGroup.protocol}
@@ -359,19 +348,17 @@ export class ServerGroups
                               onChange={(event) =>
                                 this.serverGroupFieldChanged(
                                   index,
-                                  'healthCheckConfig.healthCheckProtocol',
+                                  'healthCheckConfig.healthCheckEnabled',
                                   event.target.checked,
                                 )
                               }
                             />
-                            healthCheckEnabled
+                            &nbsp;&nbsp; healthCheckEnabled
                           </label>
                           {serverGroup.serverGroupType !== 'Fc' && (
                             <span className="wizard-pod-content">
                               <label>Protocol </label>
-                              {serverGroup.healthCheckConfig.healthCheckProtocol === 'TCP' && (
-                                <HelpField id="alicloud.serverGroup.healthCheckProtocol" />
-                              )}{' '}
+
                               <select
                                 className="form-control input-sm inline-number"
                                 value={serverGroup.healthCheckConfig.healthCheckProtocol}
@@ -390,7 +377,6 @@ export class ServerGroups
                           {serverGroup.serverGroupType !== 'Fc' && (
                             <span className="wizard-pod-content">
                               <label>Domain </label>
-                              <HelpField id="alicloud.serverGroup.attributes.healthCheckConnectPort.trafficPort" />{' '}
                               <select
                                 className="form-control input-sm inline-number"
                                 style={{ width: '90px' }}
@@ -423,7 +409,6 @@ export class ServerGroups
                           {serverGroup.serverGroupType !== 'Fc' && (
                             <span className="wizard-pod-content">
                               <label>Port </label>
-                              <HelpField id="alicloud.serverGroup.attributes.healthCheckConnectPort.trafficPort" />{' '}
                               <select
                                 className="form-control input-sm inline-number"
                                 style={{ width: '90px' }}
@@ -486,9 +471,6 @@ export class ServerGroups
                           )}
                           <span className="wizard-pod-content">
                             <label>Timeout </label>
-                            {/* {(has6sTimeout || has10sTimeout) && (
-                              <HelpField id="alicloud.serverGroup.healthCheckTimeout" />
-                            )} */}
                             <SpelNumberInput
                               error={serverGroupErrors?.healthCheckConfig?.healthCheckTimeout}
                               // disabled={has6sTimeout || has10sTimeout}
@@ -558,7 +540,6 @@ export class ServerGroups
                             <div className="wizard-pod-row-data">
                               <span className="wizard-pod-content">
                                 <label>Protocol </label>
-                                <HelpField id="alicloud.serverGroup.stickySessionConfig.stickySessionType" />{' '}
                                 <select
                                   className="form-control input-sm inline-number"
                                   value={serverGroup.stickySessionConfig.stickySessionType}
@@ -576,7 +557,6 @@ export class ServerGroups
                               </span>
                               <span className="wizard-pod-content">
                                 <label>timeOut </label>
-                                <HelpField id="alicloud.serverGroup.stickySessionConfig.cookieTimeout" />{' '}
                                 <input
                                   className="form-control input-sm inline-number"
                                   value={serverGroup.stickySessionConfig.cookieTimeout}
@@ -605,7 +585,7 @@ export class ServerGroups
                                     )
                                   }
                                 />
-                                stickySessionEnabled
+                                &nbsp;&nbsp;stickySessionEnabled
                               </label>
                             </div>
                           </div>

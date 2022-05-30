@@ -45,23 +45,6 @@ const helpContents: { [key: string]: string } = {
     '(Required) <b>Detail</b> is a naming component to help distinguish specifics of the server group.',
   'alicloud.serverGroup.enableInboundNAT':
     'An AliCloud load balancer of the basic sku will be created with adding inbound NAT port-forwarding rules to facilitate loggin on VM instances. There is no charge for creating an AliCloud load balancer of the basic sku. This option is disabled if Availability Zones are set which require Standard AliCloud Load Balancer and an extra Network Security Group with correct inbound and outbound rules configured.',
-  'alicloud.loadBalancer.ruleCondition.path': `<p>You can specify a single host name (for example, <em>my.example.com</em>). A host name is case insensitive, can be up to 128 characters in length, and can contain any of the following characters. Note that you can include up to three wildcard characters.</p>
-  <ul>
-    <li>A-Z, a-z, 0-9</li>
-    <li>- .</li>
-    <li>* (matches 0 or more characters)</li>
-    <li>? (matches exactly 1 character)</li>
-  </ul>
- <p>Note that <strong>*.example.com</strong> will match <strong>test.example.com</strong> but won't match <strong>example.com</strong>.</p>`,
-  'alicloud.loadBalancer.ruleCondition.host': `<p>You can specify a single path pattern (for example, <em>/img/*</em>). A path pattern is case sensitive, can be up to 128 characters in length, and can contain any of the following characters. Note that you can include up to three wildcard characters.</p>
-  <ul>
-    <li>A-Z, a-z, 0-9</li>
-    <li>_ - . $ / ~ " ' @ : +</li>
-    <li>& (using &amp;amp;)</li>
-    <li>* (matches 0 or more characters)</li>
-    <li>? (matches exactly 1 character)</li>
-  </ul>
-  <p>Note that the path pattern is used to route requests but does not alter them. For example, if a rule has a path pattern of <em>/img/*</em>, the rule would forward a request for <em>/img/picture.jpg</em> to the specified target group as a request for <em>/img/picture.jpg</em>.</p>`,
 };
 
 Object.keys(helpContents).forEach((key) => HelpContentsRegistry.register(key, helpContents[key]));

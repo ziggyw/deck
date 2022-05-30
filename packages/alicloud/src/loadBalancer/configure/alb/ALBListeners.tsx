@@ -7,7 +7,7 @@ import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'r
 
 import type { Application, IWizardPageComponent } from '@spinnaker/core';
 import { TetheredSelect } from '@spinnaker/core';
-import { ConfirmationModalService, CustomLabels, HelpField, Tooltip, ValidationMessage } from '@spinnaker/core';
+import { ConfirmationModalService, CustomLabels, Tooltip, ValidationMessage } from '@spinnaker/core';
 
 import { ConfigureOidcConfigModal } from './ConfigureOidcConfigModal';
 import { ConfigureRedirectConfigModal } from './ConfigureRedirectConfigModal';
@@ -585,8 +585,6 @@ const Rule = SortableElement((props: IRuleProps) => (
                 <option value="Method">Method(s)</option>
               )}
             </select>
-            {condition.type === 'Path' && <HelpField id="alicloud.loadBalancer.ruleCondition.path" />}
-            {condition.type === 'Host' && <HelpField id="alicloud.loadBalancer.ruleCondition.host" />}
             {condition.type !== 'Method' && (
               <input
                 className="form-control input-sm"
@@ -803,29 +801,10 @@ const RuleActions = (props: {
   ruleIndex?: number;
   actions: any[];
   listener: any;
-  // authenticateRuleToggle: (listener: any, index: number) => void;
   removeRule?: (listener: any, index: number) => void;
 }) => {
-  // const hasAuth = Boolean(props.actions.find((a) => a.type === 'authenticate-oidc'));
-  // const allowAuth = props.listener.protocol === 'HTTPS';
-  // const tooltip = hasAuth ? 'Remove authentication from rule' : 'Authenticate rule';
-  // const icon = hasAuth ? 'fas fa-fw fa-lock-open' : 'fas fa-fw fa-user-lock';
   return (
     <span>
-      {/* {allowAuth && (
-        <>
-          <a
-            className="btn btn-sm btn-link clickable"
-            onClick={() => props.authenticateRuleToggle(props.listener, props.ruleIndex)}
-            style={{ padding: '0' }}
-          >
-            <Tooltip value={tooltip}>
-              <i className={icon} />
-            </Tooltip>
-          </a>
-          <HelpField id="alicloud.loadBalancer.oidcAuthentication" />
-        </>
-      )} */}
       {props.ruleIndex !== undefined && props.ruleIndex >= 0 && props.removeRule && (
         <a
           className="btn btn-sm btn-link clickable"
