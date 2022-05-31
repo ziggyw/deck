@@ -72,7 +72,7 @@ export class ALBListeners
   public validate(values: any): FormikErrors<any> {
     const errors = {} as any;
 
-    const serverGroupNames = values.serverGroups.map((tg: { serverGroupName: any }) => tg.serverGroupName);
+    const serverGroupNames = values.targetServerGroups.map((tg: { serverGroupName: any }) => tg.serverGroupName);
     const usedTargetGroupNames = this.getAllTargetGroupsFromListeners(values.listeners);
     const unusedTargetGroupNames = difference(serverGroupNames, usedTargetGroupNames);
     if (unusedTargetGroupNames.length === 1) {
@@ -490,7 +490,7 @@ export class ALBListeners
                             helperClass="rule-sortable-helper"
                             removeRule={this.removeRule}
                             removeCondition={this.removeCondition}
-                            serverGroups={values.serverGroups}
+                            targetServerGroups={values.targetServerGroups}
                             oidcConfigs={oidcConfigs}
                             oidcConfigChanged={this.oidcConfigChanged}
                             redirectConfigChanged={this.redirectConfigChanged}
@@ -539,7 +539,7 @@ interface IRuleProps {
   rule: any;
   listener: any;
   index: number;
-  serverGroups: any[];
+  targetServerGroups: any[];
   oidcConfigChanged: (action: any, config: IAuthenticateOidcActionConfig) => void;
   redirectConfigChanged: (action: any, config: any) => void;
   oidcConfigs: IAuthenticateOidcActionConfig[];
@@ -648,7 +648,7 @@ const Rule = SortableElement((props: IRuleProps) => (
           oidcConfigChanged={(config) => props.oidcConfigChanged(action, config)}
           redirectConfigChanged={(config) => props.redirectConfigChanged(action, config)}
           targetChanged={(target, isDefault) => props.handleRuleActionTargetChanged(action, target, isDefault)}
-          serverGroups={props.serverGroups}
+          targetServerGroups={props.targetServerGroups}
           oidcConfigs={props.oidcConfigs}
           configureOidcClient={props.configureOidcClient}
           configureRedirect={props.configureRedirect}
@@ -674,7 +674,7 @@ const Action = (props: {
   redirectConfigChanged: (config: any) => void;
   actionTypeChanged: (actionType: string) => void;
   targetChanged: (newTarget: string, isDefault: boolean) => void;
-  serverGroups: any[];
+  targetServerGroups: any[];
   oidcConfigs: IAuthenticateOidcActionConfig[];
   configureOidcClient: (action: any) => void;
   configureRedirect: (action: any) => void;
@@ -702,7 +702,7 @@ const Action = (props: {
               required={true}
             >
               <option value="" />
-              {uniq(props.serverGroups.map((tg) => tg.serverGroupName)).map((serverGroupName) => (
+              {uniq(props.targetServerGroups.map((tg) => tg.serverGroupName)).map((serverGroupName) => (
                 <option key={serverGroupName}>{serverGroupName}</option>
               ))}
             </select>
@@ -710,7 +710,9 @@ const Action = (props: {
             <TetheredSelect
               style={{ minWidth: '200px' }}
               multi={true}
-              options={uniq(props.serverGroups.map((tg) => ({ value: tg.serverGroupName, label: tg.serverGroupName })))}
+              options={uniq(
+                props.targetServerGroups.map((tg) => ({ value: tg.serverGroupName, label: tg.serverGroupName })),
+              )}
               value={props.action?.forwardGroupConfig?.serverGroupTuples?.map(
                 (tg: { serverGroupName: any }) => tg.serverGroupName,
               )}
@@ -831,7 +833,7 @@ interface IRulesProps {
   handleConditionValueChanged: (condition: any, newValue: string) => void;
   handleHttpRequestMethodChanged: (condition: any, newValue: string, selected: boolean) => void;
   listener: any;
-  serverGroups: any[];
+  targetServerGroups: any[];
   oidcConfigChanged: (action: any, config: IAuthenticateOidcActionConfig) => void;
   redirectConfigChanged: (action: any, config: any) => void;
   oidcConfigs: IAuthenticateOidcActionConfig[];
@@ -852,7 +854,7 @@ const Rules = SortableContainer((props: IRulesProps) => (
             action={action}
             actionTypeChanged={(type) => props.handleRuleActionTypeChanged(action, type)}
             targetChanged={(target, isDefault) => props.handleRuleActionTargetChanged(action, target, isDefault)}
-            serverGroups={props.serverGroups}
+            targetServerGroups={props.targetServerGroups}
             oidcConfigs={props.oidcConfigs}
             oidcConfigChanged={(config) => props.oidcConfigChanged(action, config)}
             redirectConfigChanged={(config) => props.redirectConfigChanged(action, config)}
@@ -881,7 +883,7 @@ const Rules = SortableContainer((props: IRulesProps) => (
           redirectConfigChanged={props.redirectConfigChanged}
           removeCondition={props.removeCondition}
           removeRule={props.removeRule}
-          serverGroups={props.serverGroups}
+          targetServerGroups={props.targetServerGroups}
           oidcConfigs={props.oidcConfigs}
           listener={props.listener}
           index={index}

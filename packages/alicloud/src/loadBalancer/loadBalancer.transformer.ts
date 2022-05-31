@@ -176,7 +176,7 @@ export class AlicloudLoadBalancerTransformer {
       vpcId: '',
       // @ts-ignore
       zoneMappings: [],
-      serverGroups: [
+      targetServerGroups: [
         {
           serverGroupName: defaultTargetGroupName,
           protocol: 'HTTP',

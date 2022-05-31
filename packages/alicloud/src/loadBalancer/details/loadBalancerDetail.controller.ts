@@ -11,7 +11,6 @@ import {
   SECURITY_GROUP_READER,
 } from '@spinnaker/core';
 import type { ILoadBalancerDeleteCommand } from '@spinnaker/core';
-
 const angular = require('angular');
 
 export const ALICLOUD_LOADBALANCER_DETAILS = 'spinnaker.alicloud.loadBalancer.details.controller';
@@ -66,6 +65,8 @@ angular
 
             if (details.length) {
               $scope.loadBalancer.elb = details[0];
+              $scope.showInAlb = details[0].results.loadBalancerType === 'alb';
+              $scope.showInClb = details[0].results.loadBalancerType === 'clb';
               $scope.loadBalancer.account = loadBalancer.accountId;
             }
           });
@@ -111,12 +112,14 @@ angular
         if ($scope.loadBalancer.instances && $scope.loadBalancer.instances.length) {
           return;
         }
+
         const taskMonitor = {
           application: app,
           title: 'Deleting ' + loadBalancer.name,
         };
         const command: ILoadBalancerDeleteCommand = {
           loadBalancerName: $scope.loadBalancer.name,
+          loadBalancerId: $scope.loadBalancer.loadBalancerId,
           credentials: $scope.loadBalancer.account,
           region: loadBalancer.region,
           appName: app.name,

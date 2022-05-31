@@ -49,7 +49,7 @@ export class ServerGroups
   constructor(props: IServerGroupsProps) {
     super(props);
 
-    const oldTargetGroupCount = !props.isNew ? props.formik.initialValues.serverGroups.length : 0;
+    const oldTargetGroupCount = !props.isNew ? props.formik.initialValues.targetServerGroups.length : 0;
     this.state = {
       existingTargetGroupNames: {},
       oldTargetGroupCount,
@@ -58,7 +58,7 @@ export class ServerGroups
 
   public validate(values: any): FormikErrors<any> {
     const duplicateServerGroups = uniq(
-      flatten(filter(groupBy(values.serverGroups, 'serverGroupName'), (count) => count.length > 1)).map(
+      flatten(filter(groupBy(values.targetServerGroups, 'serverGroupName'), (count) => count.length > 1)).map(
         (tg: any) => tg.name,
       ),
     );
@@ -66,7 +66,7 @@ export class ServerGroups
     const formValidator = new FormValidator(values);
     const { arrayForEach } = formValidator;
 
-    formValidator.field('serverGroups').withValidators(
+    formValidator.field('targetServerGroups').withValidators(
       arrayForEach((builder, item) => {
         builder
           .field('serverGroupName', 'Group Name')
@@ -142,24 +142,25 @@ export class ServerGroups
   protected updateLoadBalancerNames(props: IServerGroupsProps): void {
     const { app, loadBalancer } = props;
 
-    const serverGroupsByAccountAndRegion: { [account: string]: { [region: string]: string[] } } = {};
+    const targetServerGroupsByAccountAndRegion: { [account: string]: { [region: string]: string[] } } = {};
     observableFrom(app.getDataSource('loadBalancers').refresh(true))
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         app.getDataSource('loadBalancers').data.forEach((lb: any) => {
           if (lb.loadBalancerType !== 'classic') {
             if (!loadBalancer || lb.name !== loadBalancer.name) {
-              lb.serverGroups.forEach((serverGroup: { name: string }) => {
-                serverGroupsByAccountAndRegion[lb.account] = serverGroupsByAccountAndRegion[lb.account] || {};
-                serverGroupsByAccountAndRegion[lb.account][lb.region] =
-                  serverGroupsByAccountAndRegion[lb.account][lb.region] || [];
-                serverGroupsByAccountAndRegion[lb.account][lb.region].push(this.removeAppName(serverGroup.name));
+              lb.targetServerGroups.forEach((serverGroup: { name: string }) => {
+                targetServerGroupsByAccountAndRegion[lb.account] =
+                  targetServerGroupsByAccountAndRegion[lb.account] || {};
+                targetServerGroupsByAccountAndRegion[lb.account][lb.region] =
+                  targetServerGroupsByAccountAndRegion[lb.account][lb.region] || [];
+                targetServerGroupsByAccountAndRegion[lb.account][lb.region].push(this.removeAppName(serverGroup.name));
               });
             }
           }
         });
 
-        this.setState({ existingTargetGroupNames: serverGroupsByAccountAndRegion }, () =>
+        this.setState({ existingTargetGroupNames: targetServerGroupsByAccountAndRegion }, () =>
           this.props.formik.validateForm(),
         );
       });
@@ -167,18 +168,18 @@ export class ServerGroups
 
   private serverGroupFieldChanged(index: number, field: string, value: string | boolean | number): void {
     const { setFieldValue, values } = this.props.formik;
-    const serverGroup = values.serverGroups[index];
+    const serverGroup = values.targetServerGroups[index];
     if (field === 'serverGroupType' && value === 'Fc') {
       delete serverGroup.port;
     }
     set(serverGroup, field, value);
-    setFieldValue('serverGroups', values.serverGroups);
+    setFieldValue('targetServerGroups', values.targetServerGroups);
   }
 
   private addTargetGroup = (): void => {
     const { setFieldValue, values } = this.props.formik;
-    values.serverGroups.push({
-      serverGroupName: `servergroup${values.serverGroups.length}`,
+    values.targetServerGroups.push({
+      serverGroupName: `servergroup${values.targetServerGroups.length}`,
       protocol: 'HTTP',
       Scheduler: 'Wrr',
       serverGroupType: 'Instance',
@@ -197,18 +198,18 @@ export class ServerGroups
         stickySessionEnabled: true,
       },
     });
-    setFieldValue('serverGroups', values.serverGroups);
+    setFieldValue('targetServerGroups', values.targetServerGroups);
   };
 
   private removeTargetGroup(index: number): void {
     const { setFieldValue, values } = this.props.formik;
     const { oldTargetGroupCount } = this.state;
-    values.serverGroups.splice(index, 1);
+    values.targetServerGroups.splice(index, 1);
 
     if (index < oldTargetGroupCount) {
       this.setState({ oldTargetGroupCount: oldTargetGroupCount - 1 });
     }
-    setFieldValue('serverGroups', values.serverGroups);
+    setFieldValue('targetServerGroups', values.targetServerGroups);
   }
 
   public componentDidMount(): void {
@@ -233,9 +234,9 @@ export class ServerGroups
       <div className="container-fluid form-horizontal">
         <div className="form-group">
           <div className="col-md-12">
-            {values.serverGroups.map((serverGroup: any, index: any) => {
+            {values.targetServerGroups.map((serverGroup: any, index: any) => {
               // @ts-ignore
-              const serverGroupErrors = (errors.serverGroups && errors.serverGroups[index]) || {};
+              const serverGroupErrors = (errors.targetServerGroups && errors.targetServerGroups[index]) || {};
               return (
                 <div key={index} className="wizard-pod">
                   <div>
@@ -360,6 +361,7 @@ export class ServerGroups
                               <label>Protocol </label>
 
                               <select
+                                disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                                 className="form-control input-sm inline-number"
                                 value={serverGroup.healthCheckConfig.healthCheckProtocol}
                                 onChange={(event) =>
@@ -378,6 +380,7 @@ export class ServerGroups
                             <span className="wizard-pod-content">
                               <label>Domain </label>
                               <select
+                                disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                                 className="form-control input-sm inline-number"
                                 style={{ width: '90px' }}
                                 value={serverGroup.healthCheckConfig.domain}
@@ -390,6 +393,7 @@ export class ServerGroups
                               </select>{' '}
                               {serverGroup.customDomainName && (
                                 <SpInput
+                                  disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                                   className="form-control input-sm inline-number"
                                   error={serverGroupErrors.customDomainName}
                                   name="customDomainName"
@@ -410,6 +414,7 @@ export class ServerGroups
                             <span className="wizard-pod-content">
                               <label>Port </label>
                               <select
+                                disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                                 className="form-control input-sm inline-number"
                                 style={{ width: '90px' }}
                                 value={
@@ -429,6 +434,7 @@ export class ServerGroups
                                 <option value="manual">Manual</option>
                               </select>{' '}
                               <SpInput
+                                disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                                 className="form-control input-sm inline-number"
                                 error={serverGroupErrors?.healthCheckConfig?.healthCheckConnectPort}
                                 style={{
@@ -454,6 +460,7 @@ export class ServerGroups
                             <span className="wizard-pod-content">
                               <label>Path </label>
                               <SpInput
+                                disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                                 className="form-control input-sm inline-number"
                                 error={serverGroupErrors?.healthCheckConfig?.healthCheckPath}
                                 name="healthCheckPath"
@@ -472,6 +479,7 @@ export class ServerGroups
                           <span className="wizard-pod-content">
                             <label>Timeout </label>
                             <SpelNumberInput
+                              disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                               error={serverGroupErrors?.healthCheckConfig?.healthCheckTimeout}
                               // disabled={has6sTimeout || has10sTimeout}
                               required={true}
@@ -487,6 +495,7 @@ export class ServerGroups
                           <span className="wizard-pod-content">
                             <label>Interval </label>
                             <SpelNumberInput
+                              disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                               error={serverGroupErrors?.healthCheckConfig?.healthCheckInterval}
                               required={true}
                               value={serverGroup.healthCheckConfig.healthCheckInterval}
@@ -507,6 +516,7 @@ export class ServerGroups
                           <span className="wizard-pod-content">
                             <label>Healthy </label>
                             <SpelNumberInput
+                              disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                               error={serverGroupErrors?.healthCheckConfig?.healthyThreshold}
                               value={serverGroup.healthCheckConfig.healthyThreshold}
                               min={2}
@@ -519,6 +529,7 @@ export class ServerGroups
                           <span className="wizard-pod-content">
                             <label>Unhealthy </label>
                             <SpelNumberInput
+                              disabled={!serverGroup.healthCheckConfig.healthCheckEnabled}
                               error={serverGroupErrors?.healthCheckConfig?.unhealthyThreshold}
                               required={true}
                               value={serverGroup.healthCheckConfig.unhealthyThreshold}
@@ -538,6 +549,20 @@ export class ServerGroups
                         <div className="wizard-pod-row">
                           <div className="wizard-pod-row-contents">
                             <div className="wizard-pod-row-data">
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={serverGroup.stickySessionConfig.stickySessionEnabled}
+                                  onChange={(event) =>
+                                    this.serverGroupFieldChanged(
+                                      index,
+                                      'stickySessionConfig.stickySessionEnabled',
+                                      event.target.checked,
+                                    )
+                                  }
+                                />
+                                &nbsp;&nbsp;stickySessionEnabled
+                              </label>
                               <span className="wizard-pod-content">
                                 <label>Protocol </label>
                                 <select
@@ -550,7 +575,9 @@ export class ServerGroups
                                       event.target.value,
                                     )
                                   }
-                                  disabled={index < oldTargetGroupCount}
+                                  disabled={
+                                    !serverGroup.stickySessionConfig.stickySessionEnabled || index < oldTargetGroupCount
+                                  }
                                 >
                                   {stickySessionTypeOptions}
                                 </select>
@@ -569,24 +596,11 @@ export class ServerGroups
                                   }
                                   type="text"
                                   required={true}
-                                  disabled={index < oldTargetGroupCount}
-                                />
-                              </span>
-
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  checked={serverGroup.stickySessionConfig.stickySessionEnabled}
-                                  onChange={(event) =>
-                                    this.serverGroupFieldChanged(
-                                      index,
-                                      'stickySessionConfig.stickySessionEnabled',
-                                      event.target.checked,
-                                    )
+                                  disabled={
+                                    !serverGroup.stickySessionConfig.stickySessionEnabled || index < oldTargetGroupCount
                                   }
                                 />
-                                &nbsp;&nbsp;stickySessionEnabled
-                              </label>
+                              </span>
                             </div>
                           </div>
                         </div>

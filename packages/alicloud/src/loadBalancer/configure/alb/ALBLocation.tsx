@@ -52,7 +52,17 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
     const fields = ['stack', 'detail', 'region', 'addressType', 'addressAllocatedMode', 'vpcId', 'credentials'];
     const emptyTypes = fields.filter((v) => values[v] == '');
     if (emptyTypes.length !== 0) {
-      errors.location = `${emptyTypes.join()} is required`;
+      errors.location = `${emptyTypes
+        .map((type) => {
+          if (type === 'vpcId') {
+            return 'VPC Subnet';
+          }
+          if (type === 'credentials') {
+            return 'Account';
+          }
+          return type.slice(0, 1).toLocaleUpperCase() + type.slice(1);
+        })
+        .join()} is required`;
     }
     if (values['zoneMappings'].length < 2) {
       errors.zoneMappings = 'zoneMappings is required and there are at least two vSwitch';

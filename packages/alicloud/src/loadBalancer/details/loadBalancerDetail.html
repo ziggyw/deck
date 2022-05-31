@@ -45,9 +45,12 @@
   </div>
   <div ng-if="!state.loading" class="content">
     <collapsible-section heading="Load Balancer Details" expanded="true">
+      <hello-world load-balancer="loadBalancer.elb.results" test="233"></hello-world>
       <dl class="dl-horizontal dl-flex">
         <dt>Created</dt>
         <dd>{{loadBalancer.elb.results.createTimeStamp | date:'yyyy-MM-dd HH:mm:ss'}}</dd>
+        <dt>LoadBalancerType</dt>
+        <dd>{{loadBalancer.elb.results.loadBalancerType}}</dd>
         <dt>In</dt>
         <dd>
           <account-tag account="loadBalancer.account" pad="right" provider="loadBalancer.type"></account-tag>
@@ -88,7 +91,7 @@
         </dd>
       </dl>
     </collapsible-section>
-    <collapsible-section heading="Listeners">
+    <collapsible-section ng-if="showInClb" heading="Listeners">
       <dl
         ng-repeat="loadBalancingRule in loadBalancer.elb.results.attributes.listenerPortsAndProtocal"
         style="border-bottom: 1px solid #eee; padding-bottom: 20px"
@@ -130,6 +133,94 @@
         </dd>
         <dt>Scheduler</dt>
         <dd>{{loadBalancingRule.scheduler}}</dd>
+      </dl>
+    </collapsible-section>
+
+    <collapsible-section ng-if="showInAlb" heading="TargetServerGroups">
+      <!-- <load-balancer-alb-target-group
+      target-groups="loadBalancer.elb.results.targetServerGroups"
+      > </load-balancer-alb-target-group> -->
+      <dl
+        ng-repeat="targetGroup in loadBalancer.elb.results.targetServerGroups"
+        style="border-bottom: 1px solid #eee; padding-bottom: 20px"
+      >
+        <dt>account</dt>
+        <dd>{{targetGroup.attributes.account}}</dd>
+        <dt>bizProtocol</dt>
+        <dd>{{targetGroup.attributes.bizProtocol}}</dd>
+        <dt>region</dt>
+        <dd>{{targetGroup.attributes.region}}</dd>
+        <dt>resourceGroupId</dt>
+        <dd>{{targetGroup.attributes.resourceGroupId}}</dd>
+        <dt>scheduler</dt>
+        <dd>{{targetGroup.attributes.scheduler}}</dd>
+        <dt>serverCount</dt>
+        <dd>{{targetGroup.attributes.serverCount}}</dd>
+        <dt>serverGroupId</dt>
+        <dd>{{targetGroup.attributes.serverGroupId}}</dd>
+        <dt>serverGroupName</dt>
+        <dd>{{targetGroup.attributes.serverGroupName}}</dd>
+        <dt>serverGroupStatus</dt>
+        <dd>{{targetGroup.attributes.serverGroupStatus}}</dd>
+        <dt>serverGroupType</dt>
+        <dd>{{targetGroup.attributes.serverGroupType}}</dd>
+        <dt>vpcId</dt>
+        <dd>{{targetGroup.attributes.vpcId}}</dd>
+        <dt>healthCheckEnabled</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.healthCheckEnabled.toString()}}</dd>
+        <dt>healthCheckConnectPort</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.healthCheckConnectPort}}</dd>
+        <dt>healthCheckHost</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.healthCheckHost}}</dd>
+        <dt>healthCheckHttpVersion</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.healthCheckHttpVersion}}</dd>
+        <dt>healthCheckInterval</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.healthCheckInterval}}</dd>
+        <dt>healthCheckMethod</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.healthCheckMethod}}</dd>
+        <dt>healthCheckProtocol</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.healthCheckProtocol}}</dd>
+        <dt>healthCheckTimeout</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.healthCheckTimeout}}</dd>
+        <dt>healthyThreshold</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.healthyThreshold}}</dd>
+        <dt>unhealthyThreshold</dt>
+        <dd>{{targetGroup.attributes.healthCheckConfig.unhealthyThreshold}}</dd>
+        <dt>stickySessionEnabled</dt>
+        <dd>{{targetGroup.attributes.stickySessionConfig.stickySessionEnabled.toString()}}</dd>
+        <dt>stickySessionType</dt>
+        <dd>{{targetGroup.attributes.stickySessionConfig.stickySessionType}}</dd>
+        <dt>cookieTimeout</dt>
+        <dd>{{targetGroup.attributes.stickySessionConfig.cookieTimeout}}</dd>
+      </dl>
+    </collapsible-section>
+
+    <collapsible-section ng-if="showInAlb" heading="Listeners">
+      <!-- <load-balancer-alb-listeners
+      listeners="loadBalancer.elb.results.listeners"
+      > </ad-balancer-alb-listeners> -->
+      <dl
+        ng-repeat="listener in loadBalancer.elb.results.listeners"
+        style="border-bottom: 1px solid #eee; padding-bottom: 20px"
+      >
+        <dt>gzipEnabled</dt>
+        <dd>{{listener.gzipEnabled.toString()}}</dd>
+        <dt>idleTimeout</dt>
+        <dd>{{listener.idleTimeout}}</dd>
+        <dt>listenerId</dt>
+        <dd>{{listener.listenerId}}</dd>
+        <dt>listenerPort</dt>
+        <dd>{{listener.listenerPort}}</dd>
+        <dt>listenerProtocol</dt>
+        <dd>{{listener.listenerProtocol}}</dd>
+        <dt>listenerStatus</dt>
+        <dd>{{listener.listenerStatus}}</dd>
+        <dt>loadBalancerId</dt>
+        <dd>{{listener.loadBalancerId}}</dd>
+        <dt>loadBalancerName</dt>
+        <dd>{{listener.loadBalancerName}}</dd>
+        <dt>requestTimeout</dt>
+        <dd>{{listener.requestTimeout}}</dd>
       </dl>
     </collapsible-section>
   </div>
