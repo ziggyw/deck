@@ -64,7 +64,7 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
         })
         .join()} is required`;
     }
-    if (values['zoneMappings'].length < 2) {
+    if (values['zoneMappings'].filter((item: any) => item?.vswitchId).length < 2) {
       errors.zoneMappings = 'zoneMappings is required and there are at least two vSwitch';
     }
     return errors;
@@ -98,6 +98,7 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
     const vpcIds: any = {};
     const regionIds: any = {};
     const accountIds: any = {};
+    const { region, vpcId } = this.props.formik.values;
     REST('/subnets/alicloud')
       .get()
       .then((res: any) => {
@@ -119,12 +120,28 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
           accountIds[item.account].add(item.region);
           zoneIds[item.zoneId].add({ label: `${item.vswitchId}/${item.vswitchName}`, value: item.vswitchId });
         });
-
+        const label = Object.keys(vpcIds).find((item) => item.split('/')[0] === vpcId);
         this.setState({
           vpcIds,
           regionIds,
           accountIds,
           zoneIds,
+          vpcIdsOpt: region
+            ? Object.keys(vpcIds)
+                .filter(
+                  (vpc) =>
+                    accountIds[this.props.formik.values?.credentials]?.has(region) && regionIds[region]?.has(vpc),
+                )
+                .map((vpc) => ({ label: vpc, value: vpc.split('/')[0] }))
+            : [],
+          vSwitchZoneIds: vpcId
+            ? Object.keys(zoneIds)
+                .filter((zoneId) => vpcIds[label]?.has(zoneId))
+                .map((zoneId) => ({
+                  zoneId,
+                  vSwitchs: Array.from(zoneIds[zoneId]),
+                }))
+            : [],
         });
       });
   }
@@ -157,7 +174,7 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
         })),
     });
     this.props.formik.setFieldValue('zoneMappings', []);
-    this.props.formik.setFieldValue('vpcId', vpcId.value);
+    this.props.formik.setFieldValue('vpcId', vpcId);
   };
 
   // private handleZoneIdAdd = (ZoneId: any) => {
@@ -387,34 +404,33 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
 const ZoneMappingsItem = (props: { zoneId: string; zoneMappings: any; setFieldValue: any; vSwitchs: any }) => {
   const { zoneId, zoneMappings, setFieldValue } = props;
   const handleCheckboxChange = () => {
-    if (!isChecked) {
+    if (isChecked) {
       setFieldValue(
         'zoneMappings',
         zoneMappings.filter((item: { zoneId: string }) => item.zoneId !== zoneId),
       );
     }
-    setIsChecked(!isChecked);
-  };
-  const [isChecked, setIsChecked] = React.useState(false);
-  const [vSwitchId, setVSwitchId] = React.useState('');
-  const handleVSwitchIdChange = (ZoneId: any) => {
-    setVSwitchId(ZoneId.value);
-
-    let flag = true;
-    zoneMappings.forEach((item: { zoneId: string; vSwitchId: string }) => {
-      if (item.zoneId === zoneId) {
-        item.vSwitchId = ZoneId.value;
-        flag = false;
-      }
-    }),
-      flag &&
-        zoneMappings.push({
-          zoneId,
-          vSwitchId: ZoneId.value,
-        });
-    setFieldValue('zoneMappings', zoneMappings);
+    if (!isChecked) {
+      zoneMappings.push({
+        zoneId,
+      });
+      setFieldValue('zoneMappings', zoneMappings);
+    }
   };
 
+  const handleVSwitchIdChange = (vswitchId: any) => {
+    setFieldValue(
+      'zoneMappings',
+      zoneMappings.map((item: any) => {
+        if (item.zoneId === zoneId) {
+          item.vswitchId = vswitchId.value;
+        }
+        return item;
+      }),
+    );
+  };
+  const isChecked = zoneMappings.some((item: any) => item.zoneId === zoneId);
+  const vswitchId = zoneMappings.find((item: any) => item.zoneId === zoneId)?.vswitchId;
   return (
     <tr key={zoneId}>
       <td>
@@ -429,7 +445,7 @@ const ZoneMappingsItem = (props: { zoneId: string; zoneMappings: any; setFieldVa
         <label htmlFor={zoneId}>{zoneId}</label>{' '}
       </td>
       <td>
-        <Select disabled={!isChecked} value={vSwitchId} options={props.vSwitchs} onChange={handleVSwitchIdChange} />
+        <Select disabled={!isChecked} value={vswitchId} options={props.vSwitchs} onChange={handleVSwitchIdChange} />
       </td>
     </tr>
   );

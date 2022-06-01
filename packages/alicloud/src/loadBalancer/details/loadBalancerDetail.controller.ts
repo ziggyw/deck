@@ -11,6 +11,7 @@ import {
   SECURITY_GROUP_READER,
 } from '@spinnaker/core';
 import type { ILoadBalancerDeleteCommand } from '@spinnaker/core';
+import { LoadBalancerTypes } from '../configure/choiceModal/LoadBalancerTypes';
 const angular = require('angular');
 
 export const ALICLOUD_LOADBALANCER_DETAILS = 'spinnaker.alicloud.loadBalancer.details.controller';
@@ -41,6 +42,7 @@ angular
       $scope.state = {
         loading: true,
       };
+
       $scope.firewallsLabel = FirewallLabels.get('Firewalls');
 
       function extractLoadBalancer() {
@@ -52,6 +54,7 @@ angular
           );
         })[0];
 
+        $scope.app = app;
         if ($scope.loadBalancer) {
           const detailsLoader = loadBalancerReader.getLoadBalancerDetails(
             $scope.loadBalancer.provider,
@@ -64,9 +67,13 @@ angular
             $scope.state.loading = false;
 
             if (details.length) {
+              if (!(details[0].results.loadBalancerType === 'alb')) {
+                $scope.showInClb = true;
+              }
+              $scope.subnets = details[0].results?.zoneMappings?.map((item: { vswitchId: any }) => item.vswitchId);
+
               $scope.loadBalancer.elb = details[0];
               $scope.showInAlb = details[0].results.loadBalancerType === 'alb';
-              $scope.showInClb = details[0].results.loadBalancerType === 'clb';
               $scope.loadBalancer.account = loadBalancer.accountId;
             }
           });
@@ -88,8 +95,17 @@ angular
         });
 
       this.editLoadBalancer = function editLoadBalancer() {
-        // const LoadBalancerModal: any = ConfigureLoadBalancerModal;
-        // LoadBalancerModal.show({ application: app, loadBalancer: $scope.loadBalancer, isNew: false });
+        if ($scope.loadBalancer.loadBalancerType === 'alb') {
+          const LoadBalancerModal = LoadBalancerTypes.find(
+            (t) => t.sublabel === $scope.loadBalancer.loadBalancerType.toUpperCase(),
+          ).component;
+          //@ts-ignore
+          LoadBalancerModal.show({ application: app, loadBalancer: $scope.loadBalancer });
+        } else {
+          const LoadBalancerModal = LoadBalancerTypes.find((t) => t.sublabel === 'CLB').component;
+          //@ts-ignore
+          LoadBalancerModal.show({ application: app, loadBalancer: $scope.loadBalancer });
+        }
         $uibModal.open({
           templateUrl: require('../configure/editLoadBalancer.html'),
           controller: 'alicloudCreateLoadBalancerCtrl as ctrl',

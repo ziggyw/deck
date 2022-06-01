@@ -694,19 +694,7 @@ const Action = (props: {
           <option value="Redirect">redirect to</option>
         </select>
         {props.action.type === 'ForwardGroup' &&
-          (props.isDefaultAction ? (
-            <select
-              className="form-control input-sm"
-              value={props.action.serverGroupName}
-              onChange={(event) => props.targetChanged(event.target.value, props.isDefaultAction)}
-              required={true}
-            >
-              <option value="" />
-              {uniq(props.targetServerGroups.map((tg) => tg.serverGroupName)).map((serverGroupName) => (
-                <option key={serverGroupName}>{serverGroupName}</option>
-              ))}
-            </select>
-          ) : (
+          (!props.isDefaultAction ? (
             <TetheredSelect
               style={{ minWidth: '200px' }}
               multi={true}
@@ -719,8 +707,19 @@ const Action = (props: {
               required={true}
               //@ts-ignore
               onChange={(event) => props.targetChanged(event, props.isDefaultAction)}
-              // console.log("🚀 ~ file: ALBListeners.tsx ~ line 802 ~ event", event)
             />
+          ) : (
+            <select
+              className="form-control input-sm"
+              value={props.action.serverGroupName}
+              onChange={(event) => props.targetChanged(event.target.value, props.isDefaultAction)}
+              required={true}
+            >
+              <option value="" />
+              {uniq(props.targetServerGroups.map((tg) => tg.serverGroupName)).map((serverGroupName) => (
+                <option key={serverGroupName}>{serverGroupName}</option>
+              ))}
+            </select>
           ))}
         {props.action.type === 'Redirect' && (
           <dl className="dl-horizontal dl-narrow">

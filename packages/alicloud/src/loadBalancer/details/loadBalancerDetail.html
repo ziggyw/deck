@@ -44,8 +44,8 @@
     </div>
   </div>
   <div ng-if="!state.loading" class="content">
-    <collapsible-section heading="Load Balancer Details" expanded="true">
-      <hello-world load-balancer="loadBalancer.elb.results" test="233"></hello-world>
+    <collapsible-section ng-if="showInClb" heading="Load Balancer Details" expanded="true">
+      <hello-world load-balancer="loadBalancer.elb.results" app="app"></hello-world>
       <dl class="dl-horizontal dl-flex">
         <dt>Created</dt>
         <dd>{{loadBalancer.elb.results.createTimeStamp | date:'yyyy-MM-dd HH:mm:ss'}}</dd>
@@ -136,10 +136,34 @@
       </dl>
     </collapsible-section>
 
+    <collapsible-section ng-if="showInAlb" heading="Load Balancer Details" expanded="true">
+      <!-- <hello-world load-balancer="loadBalancer.elb.results" test="233"></hello-world> -->
+      <dl class="dl-horizontal dl-flex">
+        <dt>Created</dt>
+        <dd>{{loadBalancer.elb.results.createTime | date:'yyyy-MM-dd HH:mm:ss'}}</dd>
+        <dt>LoadBalancerType</dt>
+        <dd>{{loadBalancer.elb.results.loadBalancerType}}</dd>
+        <dt>In</dt>
+        <dd>
+          <account-tag account="loadBalancer.account" pad="right" provider="loadBalancer.type"></account-tag>
+          {{loadBalancer.region}}
+        </dd>
+        <dt>VPC</dt>
+        <dd>{{loadBalancer.elb.results.vpcId}}</dd>
+        <dt>Subnet</dt>
+        <dd>
+          <li ng-repeat="subnet in subnets" style="list-style-type: none">{{subnet}}</li>
+        </dd>
+      </dl>
+      <dl class="dl-horizontal dl-flex">
+        <dt>AddressModel</dt>
+        <dd>{{loadBalancer.elb.results.addressAllocatedMode}}</dd>
+        <dt>AddressType</dt>
+        <dd>{{loadBalancer.elb.results.addressType}}</dd>
+      </dl>
+    </collapsible-section>
+
     <collapsible-section ng-if="showInAlb" heading="TargetServerGroups">
-      <!-- <load-balancer-alb-target-group
-      target-groups="loadBalancer.elb.results.targetServerGroups"
-      > </load-balancer-alb-target-group> -->
       <dl
         ng-repeat="targetGroup in loadBalancer.elb.results.targetServerGroups"
         style="border-bottom: 1px solid #eee; padding-bottom: 20px"

@@ -133,34 +133,24 @@ export class AlicloudLoadBalancerTransformer {
     };
   }
   public convertApplicationLoadBalancerForEditing(loadBalancer: any) {
-    const toEdit: any = {
-      region: loadBalancer.region,
+    return {
       credentials: loadBalancer.account,
-      name: loadBalancer.name,
       stack: loadBalancer.stack,
       detail: loadBalancer.detail,
-      vnet: loadBalancer.vnet,
-      masterZoneId: loadBalancer.masterZoneId,
-      address: loadBalancer.elb.results.attributes.address,
-      addressIPVersion: loadBalancer.elb.results.attributes.addressIPVersion,
-      addressType: loadBalancer.elb.results.attributes.addressType,
-      deleteProtection: loadBalancer.elb.results.attributes.deleteProtection,
-      loadBalancerSpec: loadBalancer.elb.results.attributes.loadBalancerSpec,
-      vSwitchId: loadBalancer.elb.results.vswitchId,
-      vSwitchName: loadBalancer.elb.results.vswitchName || '',
-      subnet: loadBalancer.subnet,
-      probes: [],
-      loadBalancingRules: [],
-      listenerPortsAndProtocal: loadBalancer.elb.results.attributes.listenerPortsAndProtocal,
-      listeners: loadBalancer.elb.results.attributes.listenerPortsAndProtocal,
+      loadBalancerType: 'ALB',
+      loadBalancerName: loadBalancer.name,
+      addressType: loadBalancer.elb.results.addressType,
+      addressAllocatedMode: loadBalancer.elb.results.addressAllocatedMode,
+      vpcId: loadBalancer.elb.results.vpcId,
+      // @ts-ignore
+      zoneMappings: loadBalancer.elb.results.zoneMappings,
+      targetServerGroups: loadBalancer.elb.results.targetServerGroups.map(
+        (target: { attributes: any }) => target.attributes,
+      ),
+
+      listeners: loadBalancer.elb.results.listeners,
+      region: loadBalancer.region,
     };
-    if (loadBalancer.elb) {
-      const elb: any = loadBalancer.elb;
-      toEdit.securityGroups = elb.securityGroups;
-      toEdit.vnet = elb.vnet;
-      toEdit.probes = elb.probes;
-    }
-    return toEdit;
   }
 
   public constructNewApplicationLoadBalancerTemplate(application: any) {
