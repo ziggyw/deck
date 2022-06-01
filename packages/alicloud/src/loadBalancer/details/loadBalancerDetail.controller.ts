@@ -5,12 +5,13 @@ import { default as UIROUTER_ANGULARJS } from '@uirouter/angularjs';
 import {
   ConfirmationModalService,
   FirewallLabels,
-  /* A service that is used to read load balancer data. */
   LOAD_BALANCER_READ_SERVICE,
   LoadBalancerWriter,
+  REST,
   SECURITY_GROUP_READER,
 } from '@spinnaker/core';
 import type { ILoadBalancerDeleteCommand } from '@spinnaker/core';
+
 import { LoadBalancerTypes } from '../configure/choiceModal/LoadBalancerTypes';
 const angular = require('angular');
 
@@ -21,7 +22,7 @@ angular
     '$scope',
     '$state',
     '$exceptionHandler',
-    '$uibModal',
+    // '$uibModal',
     'loadBalancer',
     'app',
     'securityGroupReader',
@@ -32,7 +33,7 @@ angular
       $scope: any,
       $state: any,
       _$exceptionHandler: any,
-      $uibModal: any,
+      // $uibModal: any,
       loadBalancer: any,
       app: any,
       _securityGroupReader: any,
@@ -53,7 +54,11 @@ angular
             test.account === loadBalancer.accountId
           );
         })[0];
-
+        REST(`/loadBalancers/${loadBalancer.accountId}/${loadBalancer.region}/${loadBalancer.name}?provider=alicloud`)
+          .get()
+          .then((res) => {
+            $scope.deleteParameters = res[0]?.results;
+          });
         $scope.app = app;
         if ($scope.loadBalancer) {
           const detailsLoader = loadBalancerReader.getLoadBalancerDetails(
@@ -67,13 +72,11 @@ angular
             $scope.state.loading = false;
 
             if (details.length) {
-              if (!(details[0].results.loadBalancerType === 'alb')) {
-                $scope.showInClb = true;
-              }
-              $scope.subnets = details[0].results?.zoneMappings?.map((item: { vswitchId: any }) => item.vswitchId);
-
               $scope.loadBalancer.elb = details[0];
+              $scope.showInClb = details[0].results.loadBalancerType === 'clb';
               $scope.showInAlb = details[0].results.loadBalancerType === 'alb';
+              $scope.showInAlb &&
+                ($scope.subnets = details[0].results?.zoneMappings?.map((item: { vswitchId: any }) => item.vswitchId));
               $scope.loadBalancer.account = loadBalancer.accountId;
             }
           });
@@ -95,40 +98,34 @@ angular
         });
 
       this.editLoadBalancer = function editLoadBalancer() {
-        if ($scope.loadBalancer.loadBalancerType === 'alb') {
-          const LoadBalancerModal = LoadBalancerTypes.find(
-            (t) => t.sublabel === $scope.loadBalancer.loadBalancerType.toUpperCase(),
-          ).component;
-          //@ts-ignore
-          LoadBalancerModal.show({ application: app, loadBalancer: $scope.loadBalancer });
-        } else {
-          const LoadBalancerModal = LoadBalancerTypes.find((t) => t.sublabel === 'CLB').component;
-          //@ts-ignore
-          LoadBalancerModal.show({ application: app, loadBalancer: $scope.loadBalancer });
-        }
-        $uibModal.open({
-          templateUrl: require('../configure/editLoadBalancer.html'),
-          controller: 'alicloudCreateLoadBalancerCtrl as ctrl',
-          size: 'lg',
-          resolve: {
-            application: function () {
-              return app;
-            },
-            loadBalancer: function () {
-              return angular.copy($scope.loadBalancer);
-            },
-            isNew: function () {
-              return false;
-            },
-          },
-        });
+        const LoadBalancerModal = LoadBalancerTypes.find(
+          (t) => t.sublabel === $scope.loadBalancer.loadBalancerType.toUpperCase(),
+        ).component;
+        //@ts-ignore
+        LoadBalancerModal.show({ application: app, loadBalancer: $scope.loadBalancer });
+
+        // $uibModal.open({
+        //   templateUrl: require('../configure/editLoadBalancer.html'),
+        //   controller: 'alicloudCreateLoadBalancerCtrl as ctrl',
+        //   size: 'lg',
+        //   resolve: {
+        //     application: function () {
+        //       return app;
+        //     },
+        //     loadBalancer: function () {
+        //       return angular.copy($scope.loadBalancer);
+        //     },
+        //     isNew: function () {
+        //       return false;
+        //     },
+        //   },
+        // });
       };
 
       this.deleteLoadBalancer = function deleteLoadBalancer() {
         if ($scope.loadBalancer.instances && $scope.loadBalancer.instances.length) {
           return;
         }
-
         const taskMonitor = {
           application: app,
           title: 'Deleting ' + loadBalancer.name,
@@ -141,7 +138,9 @@ angular
           appName: app.name,
           cloudProvider: 'alicloud',
         };
-        const submitMethod = () => LoadBalancerWriter.deleteLoadBalancer(command, app);
+        const submitMethod = () =>
+          LoadBalancerWriter.deleteLoadBalancer($scope.showInAlb ? $scope.deleteParameters : command, app);
+        // const submitMethod = () => LoadBalancerWriter.deleteLoadBalancer($scope.deleteParameters, app);
         ConfirmationModalService.confirm({
           header: 'Really delete ' + loadBalancer.name + '?',
           buttonText: 'Delete ' + loadBalancer.name,

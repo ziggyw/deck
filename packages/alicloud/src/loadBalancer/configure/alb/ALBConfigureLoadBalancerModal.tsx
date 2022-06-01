@@ -111,6 +111,10 @@ export class ALBConfigureLoadBalancerModal extends React.Component<
           rule.priority = index + 1;
         });
       });
+      values.zoneMappings.forEach((zoneMap: { vSwitchId: any; vswitchId: any }) => {
+        zoneMap.vSwitchId = zoneMap.vswitchId;
+        delete zoneMap.vswitchId;
+      });
 
       return LoadBalancerWriter.upsertLoadBalancer(values, application, descriptor, params);
     });
@@ -121,7 +125,6 @@ export class ALBConfigureLoadBalancerModal extends React.Component<
   };
   public render() {
     const { application, dismissModal, forPipelineConfig, loadBalancer }: any = this.props;
-
     const { isNew, loadBalancerCommand, taskMonitor } = this.state;
 
     let heading = forPipelineConfig ? 'Configure Application Load Balancer' : 'Create New Application Load Balancer';

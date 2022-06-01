@@ -174,7 +174,7 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
         })),
     });
     this.props.formik.setFieldValue('zoneMappings', []);
-    this.props.formik.setFieldValue('vpcId', vpcId);
+    this.props.formik.setFieldValue('vpcId', vpcId.value);
   };
 
   // private handleZoneIdAdd = (ZoneId: any) => {

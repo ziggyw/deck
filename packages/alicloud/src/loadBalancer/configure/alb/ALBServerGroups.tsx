@@ -146,10 +146,10 @@ export class ServerGroups
     observableFrom(app.getDataSource('loadBalancers').refresh(true))
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        app.getDataSource('loadBalancers').data.forEach((lb: any) => {
+        app.getDataSource('loadBalancers').data?.forEach((lb: any) => {
           if (lb.loadBalancerType !== 'classic') {
             if (!loadBalancer || lb.name !== loadBalancer.name) {
-              lb.targetServerGroups.forEach((serverGroup: { name: string }) => {
+              lb.targetServerGroups?.forEach((serverGroup: { name: string }) => {
                 targetServerGroupsByAccountAndRegion[lb.account] =
                   targetServerGroupsByAccountAndRegion[lb.account] || {};
                 targetServerGroupsByAccountAndRegion[lb.account][lb.region] =
