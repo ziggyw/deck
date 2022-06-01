@@ -58,6 +58,10 @@ angular
           .get()
           .then((res) => {
             $scope.deleteParameters = res[0]?.results;
+            // $scope.deleteParameters.cloudProvider = 'alicloud';
+            $scope.deleteParameters.region = loadBalancer.region;
+            $scope.deleteParameters.credentials = loadBalancer.accountId;
+            $scope.deleteParameters.appName = loadBalancer.name;
           });
         $scope.app = app;
         if ($scope.loadBalancer) {
@@ -138,8 +142,12 @@ angular
           appName: app.name,
           cloudProvider: 'alicloud',
         };
+
         const submitMethod = () =>
-          LoadBalancerWriter.deleteLoadBalancer($scope.showInAlb ? $scope.deleteParameters : command, app);
+          LoadBalancerWriter.deleteLoadBalancer(
+            $scope.showInAlb ? { ...$scope.deleteParameters, cloudProvider: 'alicloud' } : command,
+            app,
+          );
         // const submitMethod = () => LoadBalancerWriter.deleteLoadBalancer($scope.deleteParameters, app);
         ConfirmationModalService.confirm({
           header: 'Really delete ' + loadBalancer.name + '?',

@@ -219,7 +219,7 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
   };
 
   public render() {
-    // const { isNew }: any = this.props;-
+    const { isNew }: any = this.props;
     const { errors, values, setFieldValue }: any = this.props.formik;
     const { accounts, vSwitchZoneIds, regions, vpcIdsOpt }: any = this.state;
 
@@ -247,6 +247,8 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
               <div className="col-md-3 sm-label-right">Account</div>
               <div className="col-md-7">
                 <AccountSelectInput
+                  //@ts-ignore
+                  disabled={!isNew}
                   value={values.credentials}
                   onChange={(evt: any) => this.accountUpdated(evt.target.value)}
                   accounts={accounts}
@@ -258,7 +260,12 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
             <div className="form-group">
               <div className="col-md-3 sm-label-right">Region</div>
               <div className="col-md-7">
-                <Select options={regions} value={values.region} onChange={(evt: any) => this.regionUpdated(evt)} />
+                <Select
+                  disabled={!isNew}
+                  options={regions}
+                  value={values.region}
+                  onChange={(evt: any) => this.regionUpdated(evt)}
+                />
               </div>
             </div>
 
@@ -269,6 +276,7 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
               </div>
               <div className="col-md-3">
                 <input
+                  disabled={!isNew}
                   type="text"
                   className={`form-control input-sm no-spel ${errors.stack} ? 'invalid' : ''`}
                   value={values.stack}
@@ -284,6 +292,7 @@ export class ALBLocation extends React.Component<IALBLocationProps, IALBLocation
                   </span>
                 </label>
                 <input
+                  disabled={!isNew}
                   type="text"
                   className={`form-control input-sm no-spel ${errors.detail} ? 'invalid' : ''`}
                   value={values.detail}
