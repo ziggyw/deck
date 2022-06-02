@@ -66,7 +66,7 @@ export class ALBListeners
       flatten(flatten(rules.map((i) => i.actions)).map((item) => item.forwardGroupConfig?.serverGroupTuples)),
     );
     actions.push(...rules);
-    return uniq(actions.map((a) => a.serverGroupName));
+    return uniq(actions.filter((item) => !!item).map((a) => a.serverGroupName));
   }
 
   public validate(values: any): FormikErrors<any> {
@@ -711,7 +711,10 @@ const Action = (props: {
           ) : (
             <select
               className="form-control input-sm"
-              value={props.action.serverGroupName}
+              // value={props.action.serverGroupName}
+              value={
+                props.action.serverGroupName || props.action?.forwardGroupConfig?.serverGroupTuples[0]?.serverGroupName
+              }
               onChange={(event) => props.targetChanged(event.target.value, props.isDefaultAction)}
               required={true}
             >

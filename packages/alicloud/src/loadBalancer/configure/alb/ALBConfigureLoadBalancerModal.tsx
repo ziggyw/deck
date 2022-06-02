@@ -64,7 +64,7 @@ export class ALBConfigureLoadBalancerModal extends React.Component<
       taskMonitor: new TaskMonitor({
         application: application,
         title: (isNew ? 'Creating ' : 'Updating ') + 'your load balancer',
-        modalInstance: TaskMonitor.modalInstanceEmulation(() => dismissModal),
+        modalInstance: TaskMonitor.modalInstanceEmulation(() => dismissModal()),
       }),
     };
   }
