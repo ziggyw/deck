@@ -108,7 +108,23 @@ export class ALBConfigureLoadBalancerModal extends React.Component<
 
       values.listeners.forEach((listener: { rules: any[] }) => {
         listener.rules.forEach((rule, index) => {
+          rule.ruleName = `test-1${index}`;
           rule.priority = index + 1;
+          rule.actions.forEach((a: { order: number }, index: number) => {
+            a.order = index + 1;
+          });
+          rule.conditions.forEach(
+            (c: { type: string; hostConfig: { values: string }; values: any; pathConfig: { values: string } }) => {
+              if (c.type === 'Host') {
+                c.hostConfig = { values: c.values };
+                delete c.values;
+              }
+              if (c.type === 'Path') {
+                c.pathConfig = { values: c.values };
+                delete c.values;
+              }
+            },
+          );
         });
       });
       values.zoneMappings.forEach((zoneMap: { vSwitchId: any; vswitchId: any }) => {

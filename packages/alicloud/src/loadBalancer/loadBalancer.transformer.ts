@@ -15,7 +15,7 @@ export class AlicloudLoadBalancerTransformer {
         serverGroup.detachedInstances = serverGroup.detachedInstances.map(function (instanceId: any) {
           return { id: instanceId };
         });
-        serverGroup.instances = serverGroup.instances.concat(serverGroup.detachedInstances);
+        serverGroup.instances = serverGroup.instances?.concat(serverGroup.detachedInstances);
       } else {
         serverGroup.detachedInstances = [];
       }
