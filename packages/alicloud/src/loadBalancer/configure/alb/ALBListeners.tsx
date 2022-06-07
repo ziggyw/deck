@@ -564,6 +564,7 @@ const Rule = SortableElement((props: IRuleProps) => (
               <option value="Method">Method(s)</option>
             )}
           </select>
+
           {condition.type !== 'Method' && (
             <input
               className="form-control input-sm"

@@ -174,7 +174,7 @@ export class AlicloudLoadBalancerTransformer {
           };
           for (const [k, v] of Object.entries(rD)) {
             if (Object.values(v)[0].length !== 0 && k !== 'type') {
-              condition.values = Object.values(v);
+              condition.values = Object.values(v)[0];
             }
           }
           return condition;
@@ -193,9 +193,10 @@ export class AlicloudLoadBalancerTransformer {
       vpcId: loadBalancerEdit.elb.results.vpcId,
       // @ts-ignore
       zoneMappings: loadBalancerEdit.elb.results.zoneMappings,
-      targetServerGroups: loadBalancerEdit.elb.results.targetServerGroups.map(
-        (target: { attributes: any }) => target.attributes,
-      ),
+      targetServerGroups: loadBalancerEdit.elb.results.targetServerGroups.map((target: { attributes: any }) => {
+        target.attributes.protocol = target.attributes.bizProtocol;
+        return target.attributes;
+      }),
 
       listeners: loadBalancerEdit.elb.results.listeners,
       region: loadBalancerEdit.region,

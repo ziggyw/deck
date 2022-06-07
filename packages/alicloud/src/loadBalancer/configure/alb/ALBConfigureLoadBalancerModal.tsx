@@ -1,5 +1,6 @@
 import type { IQService } from 'angular';
 import type { FormikErrors, FormikValues } from 'formik';
+import { cloneDeep } from 'lodash';
 import * as React from 'react';
 
 import type { ILoadBalancerModalProps } from '@spinnaker/core';
@@ -105,8 +106,8 @@ export class ALBConfigureLoadBalancerModal extends React.Component<
         name: application.applicationName + '-' + values.stack + '-' + values.detail,
         // regionId: values.region,
       };
-
-      values.listeners.forEach((listener: { rules: any[] }) => {
+      const uploadValues = cloneDeep(values);
+      uploadValues.listeners.forEach((listener: { rules: any[] }) => {
         listener.rules.forEach((rule, index) => {
           // rule.ruleName = `test-1${index}`;
           rule.priority = index + 1;
@@ -137,12 +138,12 @@ export class ALBConfigureLoadBalancerModal extends React.Component<
           );
         });
       });
-      values.zoneMappings.forEach((zoneMap: { vSwitchId: any; vswitchId: any }) => {
+      uploadValues.zoneMappings.forEach((zoneMap: { vSwitchId: any; vswitchId: any }) => {
         zoneMap.vSwitchId = zoneMap.vswitchId;
         delete zoneMap.vswitchId;
       });
 
-      return LoadBalancerWriter.upsertLoadBalancer(values, application, descriptor, params);
+      return LoadBalancerWriter.upsertLoadBalancer(uploadValues, application, descriptor, params);
     });
   };
   private validate = (_values: FormikValues): FormikErrors<any> => {
