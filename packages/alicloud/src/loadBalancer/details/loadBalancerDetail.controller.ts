@@ -78,25 +78,24 @@ angular
 
             if (details.length) {
               $scope.loadBalancer.elb = details[0];
-              const targetGroups = $scope.loadBalancer.targetGroups.map(
-                (item: { serverGroupId: any; serverGroupName: any }) => {
-                  const targetGroup = {
-                    id: item.serverGroupId,
-                    name: item.serverGroupName,
-                  };
-                  return targetGroup;
-                },
-              );
-              $scope.loadBalancer.elb.results.listeners.forEach(
-                (item: { defaultActions: Array<{ forwardGroupConfig: { serverGroupTuples: any[] } }> }) => {
-                  targetGroups.forEach((t: any) => {
-                    if (t.id === item.defaultActions[0].forwardGroupConfig.serverGroupTuples[0].serverGroupId) {
-                      item.defaultActions[0].forwardGroupConfig.serverGroupTuples[0].serverGroupName = t.name;
-                    }
-                  });
-                },
-              );
-
+              // const targetGroups = $scope.loadBalancer.targetGroups.map(
+              //   (item: { serverGroupId: any; serverGroupName: any }) => {
+              //     const targetGroup = {
+              //       id: item.serverGroupId,
+              //       name: item.serverGroupName,
+              //     };
+              //     return targetGroup;
+              //   },
+              // );
+              // $scope.loadBalancer.elb.results.listeners.forEach(
+              //   (item: { defaultActions: Array<{ forwardGroupConfig: { serverGroupTuples: any[] } }> }) => {
+              //     targetGroups.forEach((t: any) => {
+              //       if (t.id === item.defaultActions[0].forwardGroupConfig.serverGroupTuples[0].serverGroupId) {
+              //         item.defaultActions[0].forwardGroupConfig.serverGroupTuples[0].serverGroupName = t.name;
+              //       }
+              //     });
+              //   },
+              // );
               $scope.showInClb = details[0].results.loadBalancerType === 'clb';
               $scope.showInAlb = details[0].results.loadBalancerType === 'alb';
               $scope.showInAlb &&

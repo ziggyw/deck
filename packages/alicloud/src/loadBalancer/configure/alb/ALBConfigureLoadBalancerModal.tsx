@@ -108,19 +108,29 @@ export class ALBConfigureLoadBalancerModal extends React.Component<
 
       values.listeners.forEach((listener: { rules: any[] }) => {
         listener.rules.forEach((rule, index) => {
-          rule.ruleName = `test-1${index}`;
+          // rule.ruleName = `test-1${index}`;
           rule.priority = index + 1;
           rule.actions.forEach((a: { order: number }, index: number) => {
             a.order = index + 1;
           });
           rule.conditions.forEach(
-            (c: { type: string; hostConfig: { values: string }; values: any; pathConfig: { values: string } }) => {
+            (c: {
+              type: string;
+              hostConfig: { values: string };
+              values: any;
+              pathConfig: { values: string };
+              methodConfig: { values: string };
+            }) => {
               if (c.type === 'Host') {
                 c.hostConfig = { values: c.values };
                 delete c.values;
               }
               if (c.type === 'Path') {
                 c.pathConfig = { values: c.values };
+                delete c.values;
+              }
+              if (c.type === 'Method') {
+                c.methodConfig = { values: c.values };
                 delete c.values;
               }
             },
@@ -142,7 +152,6 @@ export class ALBConfigureLoadBalancerModal extends React.Component<
   public render() {
     const { application, dismissModal, forPipelineConfig, loadBalancer }: any = this.props;
     const { isNew, loadBalancerCommand, taskMonitor } = this.state;
-
     let heading = forPipelineConfig ? 'Configure Application Load Balancer' : 'Create New Application Load Balancer';
     if (!isNew) {
       heading = `Edit ${loadBalancerCommand.name}: ${loadBalancerCommand.region}: ${loadBalancerCommand.credentials}`;

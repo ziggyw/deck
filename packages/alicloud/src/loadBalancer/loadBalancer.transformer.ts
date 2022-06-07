@@ -1,6 +1,7 @@
 'use strict';
 import type { IQService } from 'angular';
 import { module } from 'angular';
+import { cloneDeep } from 'lodash';
 
 import { AliCloudProviderSettings } from '../alicloud.settings';
 
@@ -133,23 +134,71 @@ export class AlicloudLoadBalancerTransformer {
     };
   }
   public convertApplicationLoadBalancerForEditing(loadBalancer: any) {
+    const targetGroups = {} as any;
+    const loadBalancerEdit = cloneDeep(loadBalancer);
+    loadBalancerEdit.targetGroups.forEach((item: { serverGroupId: any; serverGroupName: any }) => {
+      targetGroups[item.serverGroupId] = item.serverGroupName;
+    });
+    loadBalancerEdit.elb.results.listeners.forEach((item: { defaultActions: any }) => {
+      const id = item.defaultActions[0].forwardGroupConfig.serverGroupTuples[0].serverGroupId;
+      if (targetGroups[id]) {
+        item.defaultActions[0].serverGroupName = targetGroups[id];
+      }
+    });
+    loadBalancerEdit.elb.results.listeners.forEach((item: any) => {
+      item.rules.forEach((r: any) => {
+        r.actions = r.ruleActions.map((rA: any) => {
+          const action: any = {
+            type: rA.type,
+          };
+          if (rA.type === 'ForwardGroup') {
+            action.forwardGroupConfig = {
+              serverGroupTuples: rA?.forwardGroupConfig?.serverGroupTuples.map((serverGroup: any) => {
+                const id = serverGroup.serverGroupId;
+                if (targetGroups[id]) {
+                  serverGroup.serverGroupName = targetGroups[id];
+                }
+                return serverGroup;
+              }),
+            };
+          }
+          if (rA.type === 'redirectConfig') {
+            action.redirectConfig = rA?.redirectConfig;
+          }
+          return action;
+        });
+        r.priority = null;
+        r.conditions = r.ruleConditions.map((rD: any) => {
+          const condition: any = {
+            type: rD.type,
+          };
+          for (const [k, v] of Object.entries(rD)) {
+            if (Object.values(v)[0].length !== 0 && k !== 'type') {
+              condition.values = Object.values(v);
+            }
+          }
+          return condition;
+        });
+      });
+    });
+
     return {
-      credentials: loadBalancer.account,
-      stack: loadBalancer.stack,
-      detail: loadBalancer.detail,
+      credentials: loadBalancerEdit.account,
+      stack: loadBalancerEdit.stack,
+      detail: loadBalancerEdit.detail,
       loadBalancerType: 'ALB',
-      loadBalancerName: loadBalancer.name,
-      addressType: loadBalancer.elb.results.addressType,
-      addressAllocatedMode: loadBalancer.elb.results.addressAllocatedMode,
-      vpcId: loadBalancer.elb.results.vpcId,
+      loadBalancerName: loadBalancerEdit.name,
+      addressType: loadBalancerEdit.elb.results.addressType,
+      addressAllocatedMode: loadBalancerEdit.elb.results.addressAllocatedMode,
+      vpcId: loadBalancerEdit.elb.results.vpcId,
       // @ts-ignore
-      zoneMappings: loadBalancer.elb.results.zoneMappings,
-      targetServerGroups: loadBalancer.elb.results.targetServerGroups.map(
+      zoneMappings: loadBalancerEdit.elb.results.zoneMappings,
+      targetServerGroups: loadBalancerEdit.elb.results.targetServerGroups.map(
         (target: { attributes: any }) => target.attributes,
       ),
 
-      listeners: loadBalancer.elb.results.listeners,
-      region: loadBalancer.region,
+      listeners: loadBalancerEdit.elb.results.listeners,
+      region: loadBalancerEdit.region,
     };
   }
 

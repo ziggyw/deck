@@ -43,20 +43,6 @@ export class ALBListeners
       certificates: [],
       oidcConfigs: undefined,
     };
-
-    this.props.formik.initialValues.listeners.forEach(
-      (l: { defaultActions: Array<{ type: string }>; rules: Array<{ actions: any[] }> }) => {
-        const hasDefaultAuth = l.defaultActions[0].type === 'authenticate-oidc';
-        if (hasDefaultAuth) {
-          this.initialListenersWithDefaultAuth.add(l);
-        }
-        l.rules.forEach((r: { actions: any[] }) => {
-          if (r.actions[0].type === 'authenticate-oidc') {
-            this.initialActionsWithAuth.add(r.actions);
-          }
-        });
-      },
-    );
   }
 
   private getAllTargetGroupsFromListeners(listeners: any[]): string[] {
@@ -250,11 +236,10 @@ export class ALBListeners
 
   private handleConditionFieldChanged = (condition: any, newType: any): void => {
     condition.type = newType;
-
+    condition.values = [''];
     if (newType === 'Method') {
       condition.values = [];
     }
-
     this.updateListeners();
   };
 
@@ -282,6 +267,7 @@ export class ALBListeners
   private addCondition = (rule: any): void => {
     if (rule.conditions.length === 1) {
       const type = rule.conditions[0].type === 'Path' ? 'Host' : 'Path';
+
       rule.conditions.push({ type, values: [''] });
     }
     this.updateListeners();
@@ -563,71 +549,63 @@ const Rule = SortableElement((props: IRuleProps) => (
       <DragHandle />
     </td>
     <td>
-      {props.rule.conditions.map(
-        (
-          condition: {
-            type: string | number | readonly string[];
-            values: string | Array<string | number | readonly string[]>;
-          },
-          cIndex: React.Key,
-        ) => (
-          <div key={cIndex} className="listener-rule-condition">
-            <select
-              className="form-control input-sm inline-number"
-              value={condition.type}
-              onChange={(event) => props.handleConditionFieldChanged(condition, event.target.value as any)}
-              style={{ width: '40%' }}
+      {props.rule.conditions.map((condition: any, cIndex: React.Key) => (
+        <div key={cIndex} className="listener-rule-condition">
+          <select
+            className="form-control input-sm inline-number"
+            value={condition.type}
+            onChange={(event) => props.handleConditionFieldChanged(condition, event.target.value as any)}
+            style={{ width: '40%' }}
+            required={true}
+          >
+            {(props.rule.conditions.length === 1 || condition.type === 'Host') && <option value="Host">Host</option>}
+            {(props.rule.conditions.length === 1 || condition.type === 'Path') && <option value="Path">Path</option>}
+            {(props.rule.conditions.length === 1 || condition.type === 'Method') && (
+              <option value="Method">Method(s)</option>
+            )}
+          </select>
+          {condition.type !== 'Method' && (
+            <input
+              className="form-control input-sm"
+              type="text"
+              value={condition.values[0]}
+              onChange={(event) => props.handleConditionValueChanged(condition, event.target.value)}
+              maxLength={128}
               required={true}
-            >
-              {(props.rule.conditions.length === 1 || condition.type === 'Host') && <option value="Host">Host</option>}
-              {(props.rule.conditions.length === 1 || condition.type === 'Path') && <option value="Path">Path</option>}
-              {(props.rule.conditions.length === 1 || condition.type === 'Method') && (
-                <option value="Method">Method(s)</option>
-              )}
-            </select>
-            {condition.type !== 'Method' && (
-              <input
-                className="form-control input-sm"
-                type="text"
-                value={condition.values[0]}
-                onChange={(event) => props.handleConditionValueChanged(condition, event.target.value)}
-                maxLength={128}
-                required={true}
-                style={{ width: '63%' }}
-              />
+              style={{ width: '63%' }}
+            />
+          )}
+          {condition.type === 'Method' && (
+            <div className="col-md-6 checkbox">
+              {['DELETE', 'GET', 'PATCH', 'POST', 'PUT'].map((httpMethod) => (
+                <label key={`${httpMethod}-checkbox`}>
+                  <input
+                    type="checkbox"
+                    checked={condition.values.includes(httpMethod)}
+                    onChange={(event) =>
+                      props.handleHttpRequestMethodChanged(condition, httpMethod, event.target.checked)
+                    }
+                  />
+                  {httpMethod}
+                </label>
+              ))}
+            </div>
+          )}
+          <span className="remove-condition">
+            {cIndex === 1 && (
+              <a
+                className="btn btn-sm btn-link clickable"
+                onClick={() => props.removeCondition(props.rule, cIndex)}
+                style={{ padding: '0' }}
+              >
+                <Tooltip value="Remove Condition">
+                  <span className="glyphicon glyphicon-trash" />
+                </Tooltip>
+              </a>
             )}
-            {condition.type === 'Method' && (
-              <div className="col-md-6 checkbox">
-                {['DELETE', 'GET', 'PATCH', 'POST', 'PUT'].map((httpMethod) => (
-                  <label key={`${httpMethod}-checkbox`}>
-                    <input
-                      type="checkbox"
-                      checked={condition.values.includes(httpMethod)}
-                      onChange={(event) =>
-                        props.handleHttpRequestMethodChanged(condition, httpMethod, event.target.checked)
-                      }
-                    />
-                    {httpMethod}
-                  </label>
-                ))}
-              </div>
-            )}
-            <span className="remove-condition">
-              {cIndex === 1 && (
-                <a
-                  className="btn btn-sm btn-link clickable"
-                  onClick={() => props.removeCondition(props.rule, cIndex)}
-                  style={{ padding: '0' }}
-                >
-                  <Tooltip value="Remove Condition">
-                    <span className="glyphicon glyphicon-trash" />
-                  </Tooltip>
-                </a>
-              )}
-            </span>
-          </div>
-        ),
-      )}
+          </span>
+        </div>
+      ))}
       {props.rule.conditions.length === 1 && (
         <div className="add-new-container">
           <button type="button" className="add-new col-md-12" onClick={() => props.addCondition(props.rule)}>
@@ -712,9 +690,7 @@ const Action = (props: {
             <select
               className="form-control input-sm"
               // value={props.action.serverGroupName}
-              value={
-                props.action.serverGroupName || props.action?.forwardGroupConfig?.serverGroupTuples[0]?.serverGroupName
-              }
+              value={props.action.serverGroupName}
               onChange={(event) => props.targetChanged(event.target.value, props.isDefaultAction)}
               required={true}
             >
