@@ -145,42 +145,42 @@ export class AlicloudLoadBalancerTransformer {
         item.defaultActions[0].serverGroupName = targetGroups[id];
       }
     });
-    loadBalancerEdit.elb.results.listeners.forEach((item: any) => {
-      item.rules.forEach((r: any) => {
-        r.actions = r.ruleActions.map((rA: any) => {
-          const action: any = {
-            type: rA.type,
-          };
-          if (rA.type === 'ForwardGroup') {
-            action.forwardGroupConfig = {
-              serverGroupTuples: rA?.forwardGroupConfig?.serverGroupTuples.map((serverGroup: any) => {
-                const id = serverGroup.serverGroupId;
-                if (targetGroups[id]) {
-                  serverGroup.serverGroupName = targetGroups[id];
-                }
-                return serverGroup;
-              }),
-            };
-          }
-          if (rA.type === 'redirectConfig') {
-            action.redirectConfig = rA?.redirectConfig;
-          }
-          return action;
-        });
-        r.priority = null;
-        r.conditions = r.ruleConditions.map((rD: any) => {
-          const condition: any = {
-            type: rD.type,
-          };
-          for (const [k, v] of Object.entries(rD)) {
-            if (Object.values(v)[0].length !== 0 && k !== 'type') {
-              condition.values = Object.values(v)[0];
-            }
-          }
-          return condition;
-        });
-      });
-    });
+    // loadBalancerEdit.elb.results.listeners.forEach((item: any) => {
+    //   item.rules.forEach((r: any) => {
+    //     r.actions = r.ruleActions.map((rA: any) => {
+    //       const action: any = {
+    //         type: rA.type,
+    //       };
+    //       if (rA.type === 'ForwardGroup') {
+    //         action.forwardGroupConfig = {
+    //           serverGroupTuples: rA?.forwardGroupConfig?.serverGroupTuples.map((serverGroup: any) => {
+    //             const id = serverGroup.serverGroupId;
+    //             if (targetGroups[id]) {
+    //               serverGroup.serverGroupName = targetGroups[id];
+    //             }
+    //             return serverGroup;
+    //           }),
+    //         };
+    //       }
+    //       if (rA.type === 'redirectConfig') {
+    //         action.redirectConfig = rA?.redirectConfig;
+    //       }
+    //       return action;
+    //     });
+    //     r.priority = null;
+    //     r.conditions = r.ruleConditions.map((rD: any) => {
+    //       const condition: any = {
+    //         type: rD.type,
+    //       };
+    //       for (const [k, v] of Object.entries(rD)) {
+    //         if (Object.values(v)[0].length !== 0 && k !== 'type') {
+    //           condition.values = Object.values(v)[0];
+    //         }
+    //       }
+    //       return condition;
+    //     });
+    //   });
+    // });
 
     return {
       credentials: loadBalancerEdit.account,

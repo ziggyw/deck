@@ -78,26 +78,50 @@ angular
 
             if (details.length) {
               $scope.loadBalancer.elb = details[0];
-              // const targetGroups = $scope.loadBalancer.targetGroups.map(
-              //   (item: { serverGroupId: any; serverGroupName: any }) => {
-              //     const targetGroup = {
-              //       id: item.serverGroupId,
-              //       name: item.serverGroupName,
-              //     };
-              //     return targetGroup;
-              //   },
-              // );
-              // $scope.loadBalancer.elb.results.listeners.forEach(
-              //   (item: { defaultActions: Array<{ forwardGroupConfig: { serverGroupTuples: any[] } }> }) => {
-              //     targetGroups.forEach((t: any) => {
-              //       if (t.id === item.defaultActions[0].forwardGroupConfig.serverGroupTuples[0].serverGroupId) {
-              //         item.defaultActions[0].forwardGroupConfig.serverGroupTuples[0].serverGroupName = t.name;
-              //       }
-              //     });
-              //   },
-              // );
               $scope.showInClb = details[0].results.loadBalancerType === 'clb';
               $scope.showInAlb = details[0].results.loadBalancerType === 'alb';
+              if ($scope.showInAlb) {
+                const targetGroups = {} as any;
+                $scope.loadBalancer.targetGroups.forEach((item: { serverGroupId: any; serverGroupName: any }) => {
+                  targetGroups[item.serverGroupId] = item.serverGroupName;
+                });
+                $scope.loadBalancer.elb.results.listeners.forEach((item: any) => {
+                  item.rules.forEach((r: any) => {
+                    r.actions = r.ruleActions.map((rA: any) => {
+                      const action: any = {
+                        type: rA.type,
+                      };
+                      if (rA.type === 'ForwardGroup') {
+                        action.forwardGroupConfig = {
+                          serverGroupTuples: rA?.forwardGroupConfig?.serverGroupTuples.map((serverGroup: any) => {
+                            const id = serverGroup.serverGroupId;
+                            if (targetGroups[id]) {
+                              serverGroup.serverGroupName = targetGroups[id];
+                            }
+                            return serverGroup;
+                          }),
+                        };
+                      }
+                      if (rA.type === 'redirectConfig') {
+                        action.redirectConfig = rA?.redirectConfig;
+                      }
+                      return action;
+                    });
+                    r.priority = null;
+                    r.conditions = r.ruleConditions.map((rD: any) => {
+                      const condition: any = {
+                        type: rD.type,
+                      };
+                      for (const [k, v] of Object.entries(rD)) {
+                        if (Object.values(v)[0].length !== 0 && k !== 'type') {
+                          condition.values = Object.values(v)[0];
+                        }
+                      }
+                      return condition;
+                    });
+                  });
+                });
+              }
               $scope.showInAlb &&
                 ($scope.subnets = details[0].results?.zoneMappings?.map((item: { vswitchId: any }) => item.vswitchId));
               $scope.loadBalancer.account = loadBalancer.accountId;

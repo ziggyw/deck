@@ -170,7 +170,7 @@
       >
         <dt>account</dt>
         <dd>{{targetGroup.attributes.account}}</dd>
-        <dt>bizProtocol</dt>
+        <dt>protocol</dt>
         <dd>{{targetGroup.attributes.bizProtocol}}</dd>
         <dt>region</dt>
         <dd>{{targetGroup.attributes.region}}</dd>
@@ -227,10 +227,6 @@
         ng-repeat="listener in loadBalancer.elb.results.listeners"
         style="border-bottom: 1px solid #eee; padding-bottom: 20px"
       >
-        <dt>gzipEnabled</dt>
-        <dd>{{listener.gzipEnabled.toString()}}</dd>
-        <dt>idleTimeout</dt>
-        <dd>{{listener.idleTimeout}}</dd>
         <dt>listenerId</dt>
         <dd>{{listener.listenerId}}</dd>
         <dt>listenerPort</dt>
@@ -245,6 +241,63 @@
         <dd>{{listener.loadBalancerName}}</dd>
         <dt>requestTimeout</dt>
         <dd>{{listener.requestTimeout}}</dd>
+        <dt>gzipEnabled</dt>
+        <dd>{{listener.gzipEnabled.toString()}}</dd>
+        <dt>idleTimeout</dt>
+        <dd>{{listener.idleTimeout}}</dd>
+        <dt ng-if="listener.rules.length !== 0">rules</dt>
+        <dd>
+          <dl
+            ng-repeat="rule in listener.rules"
+            style="border-bottom: 1px solid #eee; padding-bottom: 20px; border: none; padding: 0"
+          >
+            <dt>ruleId</dt>
+            <dd>{{rule.ruleId}}</dd>
+            <dt>ruleName</dt>
+            <dd>{{rule.ruleName}}</dd>
+            <dt>ruleStatus</dt>
+            <dd>{{rule.ruleStatus}}</dd>
+            <dt>conditions</dt>
+            <dd>
+              <dl
+                ng-repeat="condition in rule.conditions"
+                style="border-bottom: 1px solid #eee; padding-bottom: 20px; border: none; padding: 0"
+              >
+                <dt>condition type</dt>
+                <dd>{{condition.type}}</dd>
+                <dt>{{condition.type}} values</dt>
+                <dd><li ng-repeat="value in condition.values" style="list-style-type: none">{{value}}</li></dd>
+              </dl>
+            </dd>
+            <dt>actions</dt>
+            <dd>
+              <dl
+                ng-repeat="action in rule.actions"
+                style="border-bottom: 1px solid #eee; padding-bottom: 20px; border: none; padding: 0"
+              >
+                <dt>action type</dt>
+                <dd>{{action.type}}</dd>
+                <dt ng-if="action.type == 'ForwardGroup'">forwardGroupConfig</dt>
+                <dd>
+                  <li
+                    ng-repeat="serverGroup in action.forwardGroupConfig.serverGroupTuples"
+                    style="list-style-type: none"
+                  >
+                    {{serverGroup.serverGroupName}}
+                  </li>
+                </dd>
+                <dt ng-if="action.type == 'Redirect'">redirectConfig</dt>
+                <dd>
+                  <p>{{action.redirectConfig.protocol}}</p>
+                  <p>{{action.redirectConfig.port}}</p>
+                  <p>{{action.redirectConfig.path}}</p>
+                  <p>{{action.redirectConfig.query}}</p>
+                  <p>{{action.redirectConfig.httpCode}}</p>
+                </dd>
+              </dl>
+            </dd>
+          </dl>
+        </dd>
       </dl>
     </collapsible-section>
   </div>
