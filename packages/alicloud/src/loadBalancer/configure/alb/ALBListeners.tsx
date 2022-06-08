@@ -1,5 +1,5 @@
 import type { FormikErrors, FormikProps } from 'formik';
-import { difference, flatten, get, some, uniq, uniqBy } from 'lodash';
+import { difference, flatten, some, uniq, uniqBy } from 'lodash';
 import { $q } from 'ngimport';
 import React from 'react';
 import type { SortEnd } from 'react-sortable-hoc';
@@ -7,12 +7,10 @@ import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'r
 
 import type { Application, IWizardPageComponent } from '@spinnaker/core';
 import { TetheredSelect } from '@spinnaker/core';
-import { ConfirmationModalService, CustomLabels, Tooltip, ValidationMessage } from '@spinnaker/core';
+import { ConfirmationModalService, Tooltip, ValidationMessage } from '@spinnaker/core';
 
-import { ConfigureOidcConfigModal } from './ConfigureOidcConfigModal';
 import { ConfigureRedirectConfigModal } from './ConfigureRedirectConfigModal';
 import type { IAuthenticateOidcActionConfig } from '../../OidcConfigReader';
-import { AliCloudProviderSettings } from '../../../alicloud.settings';
 
 export interface IALBListenersState {
   certificates: { [accountId: number]: any[] };
@@ -302,7 +300,7 @@ export class ALBListeners
     } else if (action.type === 'Redirect') {
       delete action.forwardGroupConfig;
       action.redirectActionConfig = {
-        httpCode: 'HTTP_301',
+        httpCode: '301',
       };
       delete action.serverGroupName;
     }
@@ -312,15 +310,6 @@ export class ALBListeners
   private handleSortEnd = (sortEnd: SortEnd, listener: any): void => {
     listener.rules = arrayMove(listener.rules, sortEnd.oldIndex, sortEnd.newIndex);
     this.updateListeners();
-  };
-
-  private configureOidcClient = (action: any): void => {
-    ConfigureOidcConfigModal.show({ config: action.authenticateOidcConfig })
-      .then((config: any) => {
-        action.authenticateOidcConfig = config;
-        this.updateListeners(); // pushes change to formik, needed due to prop mutation
-      })
-      .catch(() => {});
   };
 
   private configureRedirect = (action: any): void => {
@@ -481,7 +470,6 @@ export class ALBListeners
                             oidcConfigChanged={this.oidcConfigChanged}
                             redirectConfigChanged={this.redirectConfigChanged}
                             onSortEnd={(sortEnd) => this.handleSortEnd(sortEnd, listener)}
-                            configureOidcClient={this.configureOidcClient}
                             configureRedirect={this.configureRedirect}
                           />
                         </table>
@@ -539,7 +527,6 @@ interface IRuleProps {
   handleConditionFieldChanged: (condition: any, newType: any) => void;
   handleConditionValueChanged: (condition: any, newValue: string) => void;
   handleHttpRequestMethodChanged: (condition: any, newValue: string, selected: boolean) => void;
-  configureOidcClient: (action: any) => void;
   configureRedirect: (action: any) => void;
 }
 
@@ -629,7 +616,6 @@ const Rule = SortableElement((props: IRuleProps) => (
           targetChanged={(target, isDefault) => props.handleRuleActionTargetChanged(action, target, isDefault)}
           targetServerGroups={props.targetServerGroups}
           oidcConfigs={props.oidcConfigs}
-          configureOidcClient={props.configureOidcClient}
           configureRedirect={props.configureRedirect}
         />
       ))}
@@ -655,127 +641,77 @@ const Action = (props: {
   targetChanged: (newTarget: string, isDefault: boolean) => void;
   targetServerGroups: any[];
   oidcConfigs: IAuthenticateOidcActionConfig[];
-  configureOidcClient: (action: any) => void;
   configureRedirect: (action: any) => void;
 }) => {
-  if (props.action.type !== 'authenticate-oidc') {
-    const redirectConfig = props.action.redirectActionConfig || props.action.redirectConfig;
-    // TODO: Support redirect
-    return (
-      <div className="horizontal top">
-        <select
-          className="form-control input-sm"
-          style={{ width: '80px' }}
-          value={props.action.type}
-          onChange={(event) => props.actionTypeChanged(event.target.value)}
-        >
-          <option value="ForwardGroup">forward to</option>
-          <option value="Redirect">redirect to</option>
-        </select>
-        {props.action.type === 'ForwardGroup' &&
-          (!props.isDefaultAction ? (
-            <TetheredSelect
-              style={{ minWidth: '200px' }}
-              multi={true}
-              options={uniq(
-                props.targetServerGroups.map((tg) => ({ value: tg.serverGroupName, label: tg.serverGroupName })),
-              )}
-              value={props.action?.forwardGroupConfig?.serverGroupTuples?.map(
-                (tg: { serverGroupName: any }) => tg.serverGroupName,
-              )}
-              required={true}
-              //@ts-ignore
-              onChange={(event) => props.targetChanged(event, props.isDefaultAction)}
-            />
-          ) : (
-            <select
-              className="form-control input-sm"
-              // value={props.action.serverGroupName}
-              value={props.action.serverGroupName}
-              onChange={(event) => props.targetChanged(event.target.value, props.isDefaultAction)}
-              required={true}
-            >
-              <option value="" />
-              {uniq(props.targetServerGroups.map((tg) => tg.serverGroupName)).map((serverGroupName) => (
-                <option key={serverGroupName}>{serverGroupName}</option>
-              ))}
-            </select>
-          ))}
-        {props.action.type === 'Redirect' && (
-          <dl className="dl-horizontal dl-narrow">
-            {/* <dt>Host</dt>
-            <dd>{redirectConfig.host}</dd> */}
-            <dt>Path</dt>
-            <dd>{redirectConfig.path}</dd>
-            <dt>Port</dt>
-            <dd>{redirectConfig.port}</dd>
-            <dt>Protocol</dt>
-            <dd>{redirectConfig.protocol}</dd>
-            <dt>Query</dt>
-            <dd>{redirectConfig.query}</dd>
-            <dt>Http Code</dt>
-            <dd>{redirectConfig.httpCode}</dd>
-            <dt>
-              <button
-                className="btn btn-link no-padding"
-                type="button"
-                onClick={() => props.configureRedirect(props.action)}
-              >
-                Configure...
-              </button>
-            </dt>
-          </dl>
-        )}
-      </div>
-    );
-  }
-  if (props.action.type === 'authenticate-oidc') {
-    const clientId = props.action.authenticateOidcConfig.clientId;
-
-    const disableManualOidcDialog = get(AliCloudProviderSettings, 'loadBalancers.disableManualOidcDialog', false);
-    const showOidcConfigs =
-      disableManualOidcDialog ||
-      (props.oidcConfigs &&
-        props.oidcConfigs.length > 0 &&
-        (!clientId || props.oidcConfigs.find((c) => c.clientId === clientId)));
-
-    const oidcOptions = props.oidcConfigs?.length ? (
-      props.oidcConfigs.map((config) => <option key={config.clientId}>{config.clientId}</option>)
-    ) : (
-      <option disabled>No {CustomLabels.get('OIDC client')} config found</option>
-    );
-
-    return (
-      <div className="horizontal middle" style={{ height: '30px' }}>
-        <span style={{ whiteSpace: 'pre' }}>auth with {CustomLabels.get('OIDC client')} </span>
-
-        {showOidcConfigs && (
+  const redirectConfig = props.action.redirectActionConfig || props.action.redirectConfig;
+  // TODO: Support redirect
+  return (
+    <div className="horizontal top">
+      <select
+        className="form-control input-sm"
+        style={{ width: '80px' }}
+        value={props.action.type}
+        onChange={(event) => props.actionTypeChanged(event.target.value)}
+      >
+        <option value="ForwardGroup">forward to</option>
+        <option value="Redirect">redirect to</option>
+      </select>
+      {props.action.type === 'ForwardGroup' &&
+        (!props.isDefaultAction ? (
+          <TetheredSelect
+            style={{ minWidth: '200px' }}
+            multi={true}
+            options={uniq(
+              props.targetServerGroups.map((tg) => ({ value: tg.serverGroupName, label: tg.serverGroupName })),
+            )}
+            value={props.action?.forwardGroupConfig?.serverGroupTuples?.map(
+              (tg: { serverGroupName: any }) => tg.serverGroupName,
+            )}
+            required={true}
+            //@ts-ignore
+            onChange={(event) => props.targetChanged(event, props.isDefaultAction)}
+          />
+        ) : (
           <select
             className="form-control input-sm"
-            value={clientId}
-            onChange={(event) =>
-              props.oidcConfigChanged(props.oidcConfigs.find((c) => c.clientId === event.target.value))
-            }
+            // value={props.action.serverGroupName}
+            value={props.action.serverGroupName}
+            onChange={(event) => props.targetChanged(event.target.value, props.isDefaultAction)}
             required={true}
           >
             <option value="" />
-            {oidcOptions}
+            {uniq(props.targetServerGroups.map((tg) => tg.serverGroupName)).map((serverGroupName) => (
+              <option key={serverGroupName}>{serverGroupName}</option>
+            ))}
           </select>
-        )}
-        {!showOidcConfigs && (
-          // a link text to open an oidc modal that is labeled with the client_id
-          <a onClick={() => props.configureOidcClient(props.action)} className="clickable">
-            {clientId || 'Configure...'}
-          </a>
-        )}
-        <span style={{ whiteSpace: 'pre' }}>
-          <em> and then</em>
-        </span>
-      </div>
-    );
-  }
-
-  return null;
+        ))}
+      {props.action.type === 'Redirect' && (
+        <dl className="dl-horizontal dl-narrow">
+          {/* <dt>Host</dt>
+            <dd>{redirectConfig.host}</dd> */}
+          <dt>Path</dt>
+          <dd>{redirectConfig.path}</dd>
+          <dt>Port</dt>
+          <dd>{redirectConfig.port}</dd>
+          <dt>Protocol</dt>
+          <dd>{redirectConfig.protocol}</dd>
+          <dt>Query</dt>
+          <dd>{redirectConfig.query}</dd>
+          <dt>Http Code</dt>
+          <dd>{redirectConfig.httpCode}</dd>
+          <dt>
+            <button
+              className="btn btn-link no-padding"
+              type="button"
+              onClick={() => props.configureRedirect(props.action)}
+            >
+              Configure...
+            </button>
+          </dt>
+        </dl>
+      )}
+    </div>
+  );
 };
 
 const RuleActions = (props: {
@@ -816,7 +752,6 @@ interface IRulesProps {
   oidcConfigChanged: (action: any, config: IAuthenticateOidcActionConfig) => void;
   redirectConfigChanged: (action: any, config: any) => void;
   oidcConfigs: IAuthenticateOidcActionConfig[];
-  configureOidcClient: (action: any) => void;
   configureRedirect: (action: any) => void;
 }
 
@@ -837,7 +772,6 @@ const Rules = SortableContainer((props: IRulesProps) => (
             oidcConfigs={props.oidcConfigs}
             oidcConfigChanged={(config) => props.oidcConfigChanged(action, config)}
             redirectConfigChanged={(config) => props.redirectConfigChanged(action, config)}
-            configureOidcClient={props.configureOidcClient}
             configureRedirect={props.configureRedirect}
           />
         ))}
@@ -867,7 +801,6 @@ const Rules = SortableContainer((props: IRulesProps) => (
           listener={props.listener}
           index={index}
           ruleIndex={index}
-          configureOidcClient={props.configureOidcClient}
           configureRedirect={props.configureRedirect}
         />
       ))}

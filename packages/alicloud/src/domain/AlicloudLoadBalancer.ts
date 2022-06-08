@@ -24,5 +24,5 @@ export interface IRedirectActionConfig {
   port?: string;
   protocol?: 'HTTP' | 'HTTPS' | '#{protocol}';
   query?: string;
-  httpCode: 'HTTP_301' | 'HTTP_302';
+  httpCode: string;
 }

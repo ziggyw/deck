@@ -10,7 +10,6 @@ import {
   noop,
   ReactModal,
   ReactSelectInput,
-  SelectInput,
   SpinFormik,
   SubmitButton,
   TextInput,
@@ -48,7 +47,7 @@ export class ConfigureRedirectConfigModal extends React.Component<IConfigureRedi
       port: config.port || '',
       protocol: config.protocol || undefined,
       query: config.query || '',
-      httpCode: config.httpCode || 'HTTP_301',
+      httpCode: config.httpCode || '301',
     };
   }
 
@@ -126,7 +125,7 @@ export class ConfigureRedirectConfigModal extends React.Component<IConfigureRedi
                   name="httpCode"
                   label="Http Code"
                   required={true}
-                  input={(props) => <SelectInput {...props} options={['HTTP_301', 'HTTP_302']} />}
+                  input={(props) => <TextInput {...props} />}
                   help={<HelpField id="alicloud.loadBalancer.redirect.httpCode" />}
                 />
               </Modal.Body>
